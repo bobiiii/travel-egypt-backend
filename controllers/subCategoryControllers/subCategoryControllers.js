@@ -1,4 +1,5 @@
 const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
+const { uploadImageToS3, updateImageToS3 } = require('../../middlewares/awsS3');
 const { SubCategoryModel, CategoryModel } = require('../../models');
 const { asyncHandler } = require('../../utils/asynhandler');
 const { createSlug } = require('../../utils/createSlug');
@@ -80,7 +81,7 @@ const addSubCategory = asyncHandler(async (req, res, next) => {
   // const slugify = (subCategoryName) => subCategoryName.toLowerCase().replace(/\s+/g, '-');
   const sulgAuto = createSlug(subCategoryName);
 
-  const subCategoryImageId = await uploadImageToDrive(subCategoryImage);
+  const subCategoryImageId = await uploadImageToS3(subCategoryImage);
   const subCategory = await SubCategoryModel.create({
     categoryId,
     tourId,
@@ -162,7 +163,7 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
     const updateImage = files.find((item)=>item.fieldname === 'subCategoryImage')
 
     if(updateImage){
-      let updateImageId = await updateImageOnDrive(subCategory.subCategoryImage, updateImage)
+      let updateImageId = await updateImageToS3(updateImage, subCategory.subCategoryImage, )
       subCategory.subCategoryImage = updateImageId;
     }
   }

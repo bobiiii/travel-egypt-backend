@@ -4,6 +4,7 @@ const { ErrorHandler } = require('../../utils/errohandler');
 const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
 const { responseHandler } = require('../../utils/response');
 const { createSlug } = require('../../utils/createSlug');
+const { uploadImageToS3, updateImageToS3 } = require('../../middlewares/awsS3');
 
 // req access
 
@@ -68,8 +69,16 @@ const addCategory = asyncHandler(async (req, res, next) => {
   const sulgAuto = createSlug(categoryName);
   // createSlug
 
-  const categoryImageId = await uploadImageToDrive(categoryImage);
-  const categoryMobileImageId = await uploadImageToDrive(categoryMobileImage);
+  // const categoryImageId = await uploadImageToDrive(categoryImage);
+  // const categoryMobileImageId = await uploadImageToDrive(categoryMobileImage);
+
+
+  const categoryImageId = await uploadImageToS3(categoryImage);
+const categoryMobileImageId = await uploadImageToS3(categoryMobileImage);
+
+console.log(categoryImageId);
+console.log(categoryMobileImageId);
+
   const category = await CategoryModel.create({
     categoryName,
     categoryImage: categoryImageId,
@@ -115,16 +124,17 @@ const updateCategory = asyncHandler(async (req, res, next) => {
 
 
   if (files && files.length !== 0) {
-    const fileId = category.categoryImage;
+    const categoryImageId = category.categoryImage;
     const updateImage = files.find((item) => item.fieldname === "categoryImage");
     const categoryMobImage = files.find((item) => item.fieldname === "categoryMobImage");
+    
     if (updateImage) {
-      let updateImageId = await updateImageOnDrive(fileId, updateImage);
+      let updateImageId = await updateImageToS3( updateImage,category.categoryImage);
       category.categoryImage = updateImageId;
     }
+    
     if (categoryMobImage){
-      let categoryMobImageId = await updateImageOnDrive(category.categoryMobImage, categoryMobImage);
-
+      let categoryMobImageId = await updateImageToS3( categoryMobImage, category.categoryMobImage);
       category.categoryMobImage = categoryMobImageId;
     }
   }

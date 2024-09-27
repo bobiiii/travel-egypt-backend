@@ -3,6 +3,7 @@ const { asyncHandler } = require('../../utils/asynhandler');
 const { ErrorHandler } = require('../../utils/errohandler');
 const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
 const { createSlug } = require('../../utils/createSlug');
+const { uploadImageToS3, updateImageToS3 } = require('../../middlewares/awsS3');
 
 
 const getTour = asyncHandler(async (req, res, next) => {
@@ -85,10 +86,10 @@ console.log(includes);
   for (const file of files) {
 
     if (file.fieldname === 'cardImage') {
-      cardImageId = uploadImageToDrive(file);
+      cardImageId = uploadImageToS3(file);
 
     } else if (file.fieldname === 'tourImages') {
-      tourImagesPromises.push(uploadImageToDrive(file));
+      tourImagesPromises.push(uploadImageToS3(file));
     }
   }
 
@@ -203,9 +204,9 @@ const updateTour = asyncHandler(async (req, res, next) => {
   if (files && files.length !== 0) {
     for (const file of files) {
       if (file.fieldname === 'cardImage') {
-        await updateImageOnDrive(tour.cardImage, file);
+        await updateImageToS3( file, tour.cardImage,);
       } else if (file.fieldname === 'tourImage') {
-        await updateImageOnDrive(tourImageId, file);
+        await updateImageToS3( file, tourImageId);
       }
     }
   }
