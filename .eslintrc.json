@@ -1,0 +1,30 @@
+{
+    "extends": "airbnb-base",
+    "settings": {
+    },
+    "rules": {
+        "linebreak-style": ["error", "unix"],
+        "linebreak-style": ["error", "windows"],
+        "max-len": [1, 400, 2, {"ignoreComments": true}],
+        "no-underscore-dangle": [0, { "allow": [] }],
+        "semi": ["error", "always"],
+        "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
+        "import/no-extraneous-dependencies": "off",
+        "camelcase": "error"
+    },
+    "overrides": [
+        {
+            "files": "*.js",
+            "rules": {
+                "no-console": "off",
+                "linebreak-style": 0,
+        "semi": ["error", "always"],
+        "quotes": ["error", "single"],
+        // "no-unused-vars": "off"
+            }
+        }
+    ],
+    "globals": {
+        "logger": true
+    }
+}
