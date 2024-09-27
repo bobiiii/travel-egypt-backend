@@ -69,6 +69,7 @@ const addTour = asyncHandler(async (req, res, next) => {
   const highlights = req?.body?.highlights && JSON?.parse(req?.body?.highlights);
   const importantInformation = req?.body?.importantInformation && JSON?.parse(req?.body?.importantInformation);
 
+console.log(includes);
 
 
   const subCategory = await SubCategoryModel.findById(subCategoryId);
@@ -92,8 +93,7 @@ const addTour = asyncHandler(async (req, res, next) => {
   }
 
 
-  // const slugify = (name) => name ? name.toLowerCase().replace(/\s+/g, '-') : `tour-${Date.now()}`;
-  const slugAuto = createSlug(title);
+   const slugAuto = createSlug(title);
 
 
   const [cardImageIdResolved, ...tourImagesIdsResolved] = await Promise.all([
@@ -155,7 +155,7 @@ const updateTour = asyncHandler(async (req, res, next) => {
   const { files } = req;
   const {
     title, duration, description, fullDescription, strikePrice, priceAdult, priceChild, languages, tag, heading, subCategoryId,
-    highlightPoint, highlightId, includePoint, includePointId, importantInfoPoint, importantInfoPointId, tourImageId
+    highlightPoint, highlightId, includePoint, includePointId, includeType,  importantInfoPoint, importantInfoPointId, tourImageId
   } = req.body;
 
   let tour = await TourModel.findById(tourId);
@@ -194,6 +194,7 @@ const updateTour = asyncHandler(async (req, res, next) => {
 
   } else if (includes) {
     includes.point = includePoint || includes.point;
+    includes.type = includeType || includes.type;
   } else if (importantInfo) {
     importantInfo.point = importantInfoPoint || importantInfo.point;
   }

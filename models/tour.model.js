@@ -10,6 +10,12 @@ const { Schema } = mongoose;
 const includesSchema = new mongoose.Schema({
   _id: { type: Schema.ObjectId, auto: true},
   point: { type: String },
+  type: {
+    type: String,
+  enum: ["included", "excluded"],
+  
+  },
+  
 });
 
 const highlightsSchema = new mongoose.Schema({
