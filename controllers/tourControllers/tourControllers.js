@@ -62,26 +62,25 @@ const getAllTours = asyncHandler(async (req, res, next) => {
 const addTour = asyncHandler(async (req, res, next) => {
   const { files } = req;
   const {
-    title, duration, description, fullDescription, strikePrice, priceAdult, priceChild, languages, tag, heading, subCategoryId,
+    title, duration, description, fullDescription, strikePrice, discountAmount, priceAdult, priceChild, languages, tag, heading, subCategoryId,
   } = req.body;
-
 
   const includes = req?.body?.includes && JSON?.parse(req?.body?.includes);
   const highlights = req?.body?.highlights && JSON?.parse(req?.body?.highlights);
   const importantInformation = req?.body?.importantInformation && JSON?.parse(req?.body?.importantInformation);
-
-console.log(includes);
-
 
   const subCategory = await SubCategoryModel.findById(subCategoryId);
   if (!subCategory) {
     return next(new ErrorHandler('SubCategory Not Found', 400));
   }
 
+if (discountAmount) {
+  childPriceAfterDiscount = priceChild - discountAmount,
+  adultPriceAfterDiscount = priceAdult - discountAmount
+}
 
-  let cardImageId;
+let cardImageId;
   const tourImagesPromises = [];
-
 
   for (const file of files) {
 
@@ -93,16 +92,12 @@ console.log(includes);
     }
   }
 
-
-   const slugAuto = createSlug(title);
-
-
-  const [cardImageIdResolved, ...tourImagesIdsResolved] = await Promise.all([
+const [cardImageIdResolved, ...tourImagesIdsResolved] = await Promise.all([
     cardImageId || Promise.resolve(null),
     ...tourImagesPromises
   ]);
-
   
+  const slugAuto = createSlug(title);
   const tours = await TourModel.create({
     title,
     slug: slugAuto,
@@ -114,6 +109,9 @@ console.log(includes);
     strikePrice,
     priceAdult,
     priceChild,
+    childPriceAfterDiscount,
+    adultPriceAfterDiscount,
+    discountAmount,
     languages,
     tag,
     highlights,
@@ -138,10 +136,22 @@ console.log(includes);
     return next(new ErrorHandler('Unable to add tour to subcategory', 500));
   }
 
-  if (!tours) {
-    return next(new ErrorHandler('Unable to add tour', 500));
+  if (discountAmount) {
+    const discountedTour = await DiscountedTourModel.findOneAndUpdate(
+      {}, // No filter, updates the first document or creates a new one
+      { 
+        $push: { tourId: tours._id }, 
+        },
+      { 
+        new: true, 
+        upsert: true 
+      }
+    );
+    if (!discountedTour) {
+      return next(new ErrorHandler('Unable to add tour to discounted tours', 500));
+    }  
   }
-
+  
   return res.status(200).json({
     status: 'Success',
     code: 200,

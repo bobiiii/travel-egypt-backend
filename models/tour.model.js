@@ -8,23 +8,23 @@ const { Schema } = mongoose;
 // }, { _id: false });
 
 const includesSchema = new mongoose.Schema({
-  _id: { type: Schema.ObjectId, auto: true},
+  _id: { type: Schema.ObjectId, auto: true },
   point: { type: String },
   type: {
     type: String,
-  enum: ["included", "excluded"],
-  
+    enum: ["included", "excluded"],
+
   },
-  
+
 });
 
 const highlightsSchema = new mongoose.Schema({
-  _id: { type: Schema.ObjectId, auto: true},
-    point: { type: String },
-} );
+  _id: { type: Schema.ObjectId, auto: true },
+  point: { type: String },
+});
 
 const importantInformationSchema = new mongoose.Schema({
-  _id: { type: Schema.ObjectId, auto: true},
+  _id: { type: Schema.ObjectId, auto: true },
   point: { type: String },
 });
 
@@ -39,6 +39,16 @@ const tourSchema = new mongoose.Schema({
   strikePrice: { type: Number },
   priceAdult: { type: Number },
   priceChild: { type: Number },
+  discountAmount: { type: Number, default: 0,   required: true,
+  },
+  childPriceAfterDiscount: { type: Number, default: 0,   required: true,
+  },
+  adultPriceAfterDiscount: { type: Number, default:0,   required: true,
+  },
+  discountAmount: { type: Number, default: 0,   required: true,
+  },
+
+
   languages: { type: [String] },
   tag: { type: String }, // add
 
@@ -62,8 +72,8 @@ const bestTourSchema = new mongoose.Schema(
 );
 
 const discountedTourSchema = new mongoose.Schema({
-  tourId: { type: Schema.Types.ObjectId, ref: 'Tour', required: true },
-  addedDate: { type: Date, default: Date.now },
+  tourId: [{ type: Schema.Types.ObjectId, ref: 'Tour', required: true }],
+  // addedDate: { type: Date, default: Date.now },
 });
 
 // Adding Virtual Population for Reviews
@@ -79,19 +89,19 @@ tourSchema.set('toObject', { virtuals: true });
 
 // 5 cat create krni h
 const categorySchema = new mongoose.Schema({
-  
+
   slug: { type: String, required: true, unique: true },
   categoryName: { type: String }, // add
   categoryImage: { type: String }, // add
   categoryMobImage: { type: String },
-  bannerText: {type: String},
-  bannerSlogan: {type: String},
+  bannerText: { type: String },
+  bannerSlogan: { type: String },
   subCategoryId: [{ type: Schema.Types.ObjectId, ref: 'SubCategory' }], // add multiple subcategory obj ids
 });
 
 const blogSchema = new mongoose.Schema({
-  title: { type: String }, 
-  cardImage: { type: String }, 
+  title: { type: String },
+  cardImage: { type: String },
   para: { type: String }
 });
 
@@ -143,16 +153,16 @@ const bookingSchema = new mongoose.Schema({
 });
 
 
-const BookingModel =  mongoose.model('Booking', bookingSchema);
-const TourModel =  mongoose.model('Tour', tourSchema);
-const PopularTourModel =  mongoose.model('PopularTour', popularTourSchema);
+const BookingModel = mongoose.model('Booking', bookingSchema);
+const TourModel = mongoose.model('Tour', tourSchema);
+const PopularTourModel = mongoose.model('PopularTour', popularTourSchema);
 const CategoryModel = mongoose.model('Category', categorySchema);
-const SubCategoryModel =  mongoose.model('SubCategory', subCategorySchema);
-const ReviewModel =  mongoose.model('Review', reviewSchema);
-const BestTourModel =  mongoose.model('BestTours', bestTourSchema);
-const DiscountedTourModel =  mongoose.model('DiscountedTours', discountedTourSchema);
-const BlogModel =  mongoose.model('Blogs', blogSchema);
-const ApprovedReviewModel =  mongoose.model('ApprovedReviews', approvedReviewSchema);
+const SubCategoryModel = mongoose.model('SubCategory', subCategorySchema);
+const ReviewModel = mongoose.model('Review', reviewSchema);
+const BestTourModel = mongoose.model('BestTours', bestTourSchema);
+const DiscountedTourModel = mongoose.model('DiscountedTours', discountedTourSchema);
+const BlogModel = mongoose.model('Blogs', blogSchema);
+const ApprovedReviewModel = mongoose.model('ApprovedReviews', approvedReviewSchema);
 
 module.exports = {
   TourModel, CategoryModel, SubCategoryModel, ReviewModel, BookingModel, PopularTourModel, BestTourModel, DiscountedTourModel, ApprovedReviewModel, BlogModel,
