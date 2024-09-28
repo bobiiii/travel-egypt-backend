@@ -1,4 +1,4 @@
-const { S3Client, UploadCommand, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { S3Client, UploadCommand, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const { v4: uuidv4 } = require('uuid');
 
 const s3Client = new S3Client({
@@ -58,9 +58,25 @@ const updateImageToS3 = async (image, existingImageKey) => {
   };
 
 
+  const deleteObjectFromS3 = async (imageKey) => {
+    const deleteParams = {
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: imageKey,
+    };
+    const command = new DeleteObjectCommand(deleteParams);
+    try {
+      await s3Client.send(command);
+      
+    } catch (err) {
+      console.error(err);
+      throw new Error('Error deleting object from S3');
+    }
+  };
+
 
 
 module.exports = {
     uploadImageToS3   ,
     updateImageToS3,
+    deleteObjectFromS3
 }

@@ -4,7 +4,7 @@ const { ErrorHandler } = require('../../utils/errohandler');
 const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
 const { responseHandler } = require('../../utils/response');
 const { createSlug } = require('../../utils/createSlug');
-const { uploadImageToS3, updateImageToS3 } = require('../../middlewares/awsS3');
+const { uploadImageToS3, updateImageToS3, deleteObjectFromS3 } = require('../../middlewares/awsS3');
 
 // req access
 
@@ -178,7 +178,7 @@ const deleteCategory = asyncHandler(async (req, res, next) => {
 
   // Delete category image if it exists
   if (category.categoryImage) {
-    await deleteImage(category.categoryImage);
+    await deleteObjectFromS3(category.categoryImage);
   }
 
   // Use the subCategoryId array from the category to delete associated tours

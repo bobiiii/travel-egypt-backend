@@ -1,5 +1,5 @@
 const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
-const { uploadImageToS3, updateImageToS3 } = require('../../middlewares/awsS3');
+const { uploadImageToS3, updateImageToS3, deleteObjectFromS3 } = require('../../middlewares/awsS3');
 const { SubCategoryModel, CategoryModel } = require('../../models');
 const { asyncHandler } = require('../../utils/asynhandler');
 const { createSlug } = require('../../utils/createSlug');
@@ -199,7 +199,7 @@ const deleteSubCategory = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler('Subcategory Doesn\'t Exist', 404));
   }
 
-  await deleteImage(subCategory.subCategoryImage);
+  await deleteObjectFromS3(subCategory.subCategoryImage);
 
   await CategoryModel.findByIdAndUpdate(subCategory.categoryId, {
     $pull: { subcategoryId: subCategory._id },

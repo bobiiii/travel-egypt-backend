@@ -3,7 +3,7 @@ const { asyncHandler } = require('../../utils/asynhandler');
 const { ErrorHandler } = require('../../utils/errohandler');
 const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
 const { createSlug } = require('../../utils/createSlug');
-const { uploadImageToS3, updateImageToS3 } = require('../../middlewares/awsS3');
+const { uploadImageToS3, updateImageToS3, deleteObjectFromS3 } = require('../../middlewares/awsS3');
 
 
 const getTour = asyncHandler(async (req, res, next) => {
@@ -242,7 +242,7 @@ const deleteTour = asyncHandler(async (req, res, next) => {
   try {
     await Promise.all(tourAllImages.map(imageId => {
 
-      deleteImage(imageId)
+      deleteObjectFromS3(imageId)
 
     }));
   } catch (error) {

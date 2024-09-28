@@ -143,16 +143,16 @@ const bookingSchema = new mongoose.Schema({
 });
 
 
-const BookingModel = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);
+const BookingModel =  mongoose.model('Booking', bookingSchema);
 const TourModel =  mongoose.model('Tour', tourSchema);
-const PopularTourModel = mongoose.models.PopularTour || mongoose.model('PopularTour', popularTourSchema);
+const PopularTourModel =  mongoose.model('PopularTour', popularTourSchema);
 const CategoryModel = mongoose.model('Category', categorySchema);
 const SubCategoryModel =  mongoose.model('SubCategory', subCategorySchema);
-const ReviewModel = mongoose.models.Review || mongoose.model('Review', reviewSchema);
-const BestTourModel = mongoose.models.BestTours || mongoose.model('BestTours', bestTourSchema);
-const DiscountedTourModel = mongoose.models.BestTours || mongoose.model('DiscountedTours', discountedTourSchema);
-const BlogModel = mongoose.models.BlogModel || mongoose.model('Blogs', blogSchema);
-const ApprovedReviewModel = mongoose.models.ApprovedSchemaModel || mongoose.model('ApprovedReviews', approvedReviewSchema);
+const ReviewModel =  mongoose.model('Review', reviewSchema);
+const BestTourModel =  mongoose.model('BestTours', bestTourSchema);
+const DiscountedTourModel =  mongoose.model('DiscountedTours', discountedTourSchema);
+const BlogModel =  mongoose.model('Blogs', blogSchema);
+const ApprovedReviewModel =  mongoose.model('ApprovedReviews', approvedReviewSchema);
 
 module.exports = {
   TourModel, CategoryModel, SubCategoryModel, ReviewModel, BookingModel, PopularTourModel, BestTourModel, DiscountedTourModel, ApprovedReviewModel, BlogModel,
