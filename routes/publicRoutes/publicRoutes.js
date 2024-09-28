@@ -14,9 +14,9 @@ publicRoute.get('/get-subcategories/:slug', subCategoryControllers.getSubCategor
 // publicRoute.get('/category/:categoryId', categoryControllers.getCategoryWithTours);
 publicRoute.get('/get-reviews', reviewControllers.getReviews);
 publicRoute.get('/get-approved-reviews', reviewControllers.getApprovedReviews);
-publicRoute.get('/get-besttour/:bestTourId', bstControllers.getBestTour);
+// publicRoute.get('/get-besttour/:bestTourId', bstControllers.getBestTour);
+// publicRoute.get('/get-discountedtour/:discountedTourId', discountedTours.getDiscountedTour);
 publicRoute.get('/get-besttours', bstControllers.getAllBestTours);
-publicRoute.get('/get-discountedtour/:discountedTourId', discountedTours.getDiscountedTour);
 publicRoute.get('/get-discountedtours', discountedTours.getAllDiscountTours);
 publicRoute.get('/get-popular-tours', popularToursControllers.getAllPopularTours);
 

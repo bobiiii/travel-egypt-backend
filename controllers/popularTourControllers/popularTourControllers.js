@@ -5,7 +5,7 @@ const { ErrorHandler } = require("../../utils/errohandler");
 const getAllPopularTours = asyncHandler(async (req, res, next) => {
   
   const popularTours = await PopularTourModel.find().populate('tourId');
-  if (popularTours.length === 0) {
+  if (!popularTours) {
     return next(new ErrorHandler('No Popular Tours Found', 404));
   }
 
@@ -19,8 +19,24 @@ const getAllPopularTours = asyncHandler(async (req, res, next) => {
 });
 
 const addPopularTour = asyncHandler(async (req, res, next) => {
-  
-  const popularTour = await PopularTourModel.create(req.body);
+  const {popularTourId} = req.body
+
+  if (!popularTourId) {
+    return next(new ErrorHandler('Please send valid popularTourId', 500));
+  }
+
+  const popularTour = await PopularTourModel.findOneAndUpdate(
+    {}, // No filter, updates the first document or creates a new one
+    { 
+      $push: { tourId: popularTourId }, 
+      },
+    { 
+      new: true, 
+      upsert: true 
+    }
+  );
+
+  // const popularTour = await PopularTourModel.create(req.body);
   if (!popularTour) {
     return next(new ErrorHandler('Unable to add popular Tour', 500));
   }
@@ -33,22 +49,45 @@ const addPopularTour = asyncHandler(async (req, res, next) => {
 });
 
 const updatePopularTour  = asyncHandler(async(req,res,next)=>{
-  return res.status(200).json({message:"Success"})
+const {popularTourId} = req.body
+  const updatedPopularTours = await PopularTourModel.findOneAndUpdate(
+    {}, // Since you have only one document
+    { $pull: { tourId: popularTourId } },
+    { new: true }
+  );
+
+  if (!updatedPopularTours) {
+    return next(new ErrorHandler('Unable to remove tour from popular tours', 500));
+  }
+
+  return res.status(200).json(
+    {
+      status: 'Success',
+      message: 'Tour removed Successfully',
+      // data: popularTours,
+    },
+  );
 })
 
 const deletePopularTour = asyncHandler(async (req, res, next) => {
-  const { popularTourId } = req.params;
+  const {popularTourId} = req.params
+  const updatedPopularTours = await PopularTourModel.findOneAndUpdate(
+    {}, // Since you have only one document
+    { $pull: { tourId: popularTourId } },
+    { new: true }
+  );
 
-  const popularTour = await PopularTourModel.findByIdAndDelete(popularTourId);
-  if (!popularTour) {
-    return next(new ErrorHandler('Popular Tour doesn\'t exist', 404));
+  if (!updatedPopularTours) {
+    return next(new ErrorHandler('Unable to remove tour from popular tours', 500));
   }
 
-  return res.status(200).json({
-    status: 'Success',
-    message: 'Popular Tour Deleted Successfully',
-    
-  });
+  return res.status(200).json(
+    {
+      status: 'Success',
+      message: 'Tour removed Successfully',
+      // data: popularTours,
+    },
+  );
 });
 
 module.exports = {

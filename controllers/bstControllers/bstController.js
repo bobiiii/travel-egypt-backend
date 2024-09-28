@@ -4,18 +4,22 @@ const { BestTourModel, TourModel } = require('../../models');
 const { ErrorHandler } = require('../../utils/errohandler');
 
 const addBestToursController = asyncHandler(async (req, res, next) => {
-  const { tourId } = req.body;
+  const { bestTourId } = req.body;
 
-  if (tourId === '') {
-    return next(new ErrorHandler('Please fill the fields', 400));
+  if (!bestTourId) {
+    return next(new ErrorHandler('Please send valid popularTourId', 500));
   }
-  const tour = await TourModel.findById(tourId);
+  const bestTour = await BestTourModel.findOneAndUpdate(
+    {}, // No filter, updates the first document or creates a new one
+    { 
+      $push: { tourId: bestTourId }, 
+      },
+    { 
+      new: true, 
+      upsert: true 
+    }
+  );
 
-  if (!tour) {
-    return next(new ErrorHandler('Tour Doesn\'t Exist', 404));
-  }
-
-  const bestTour = await BestTourModel.create(req.body);
 
   if (!bestTour) {
     return next(new ErrorHandler('Unable to add BestTour', 500));
@@ -30,29 +34,8 @@ const addBestToursController = asyncHandler(async (req, res, next) => {
 
 const getAllBestTours = asyncHandler(async (req, res, next) => {
   const bestTours = await BestTourModel.find({}).populate("tourId")
-  // const bestTours = await BestTourModel.aggregate([
-  //   {
-  //     $lookup: {
-  //       from: 'tours',
-  //       localField: 'tourId',
-  //       foreignField: '_id',
-  //       as: 'tourDetails',
-  //     },
-  //   },
-  //   {
-  //     $unwind: {
-  //       path: '$tourDetails',
-  //       preserveNullAndEmptyArrays: true,
-  //     },
-  //   },
-  //   {
-  //     $project: {
-  //       'tourDetails._id': 0,
-  //     },
-  //   },
-  // ]);
 
-  if (bestTours.length === 0) {
+  if (!bestTours) {
     return next(new ErrorHandler('No bestTours Found'), 404);
   }
 
@@ -99,28 +82,46 @@ const getBestTour = asyncHandler(async (req, res, next) => {
 });
 
 const deleteBestTour = asyncHandler(async (req, res, next) => {
-  const { bestTourId } = req.params;
-  const bestTour = await BestTourModel.findByIdAndDelete(bestTourId);
+  const {bestTourId} = req.params
+  const bestTour = await BestTourModel.findOneAndUpdate(
+    {}, // Since you have only one document
+    { $pull: { tourId: bestTourId } },
+    { new: true }
+  );
 
   if (!bestTour) {
-    return next(new ErrorHandler('BestTour Doesn\'t Exist', 404));
+    return next(new ErrorHandler('Unable to remove tour from BestSelling  tours', 500));
   }
-  return res.status(200).json({
-    status: 'Success',
-    message: 'BestTour Deleted Successfully',
-    data: bestTour,
-  });
+
+  return res.status(200).json(
+    {
+      status: 'Success',
+      message: 'Tour removed Successfully',
+      // data: popularTours,
+    },
+  )
 });
 
 const updateBestTour = asyncHandler(async (req, res) => {
-  const { bestTourId } = req.params;
-  const bestTour = await BestTourModel.findByIdAndUpdate(bestTourId, req.body, { new: true });
+  
+  const {bestTourId} = req.body
+  const bestTour = await BestTourModel.findOneAndUpdate(
+    {}, // Since you have only one document
+    { $pull: { tourId: bestTourId } },
+    { new: true }
+  );
 
-  return res.status(200).json({
-    status: 'Success',
-    message: 'Update BedtTour Successfully',
-    data: bestTour,
-  });
+  if (!bestTour) {
+    return next(new ErrorHandler('Unable to remove tour from popular tours', 500));
+  }
+
+  return res.status(200).json(
+    {
+      status: 'Success',
+      message: 'Tour removed Successfully',
+      // data: popularTours,
+    },
+  )
 });
 
 module.exports = {

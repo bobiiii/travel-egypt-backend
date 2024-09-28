@@ -66,8 +66,8 @@ const tourSchema = new mongoose.Schema({
 
 const bestTourSchema = new mongoose.Schema(
   {
-    tourId: { type: Schema.Types.ObjectId, ref: 'Tour', required: true },
-    addedDate: { type: Date, default: Date.now },
+    tourId: [{ type: Schema.Types.ObjectId, ref: 'Tour', required: true }],
+    
   },
 );
 
@@ -115,8 +115,8 @@ const subCategorySchema = new mongoose.Schema({
 });
 
 const popularTourSchema = new mongoose.Schema({
-  tourId: { type: Schema.Types.ObjectId, ref: 'Tour', required: true },
-  addedDate: { type: Date, default: Date.now },
+  tourId:[ { type: Schema.Types.ObjectId, ref: 'Tour', required: true }],
+  // addedDate: { type: Date, default: Date.now },
 });
 
 const reviewSchema = new mongoose.Schema({

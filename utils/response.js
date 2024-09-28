@@ -5,8 +5,14 @@ const responseHandler =  (res, message,  data = null)=>{
         message: message,
       };
     
+
+
+
       if (data !== null) {
         response.data = data;
+      }
+      if (data === null) {
+        response.data = [];
       }
       return res.status(200).json(response);
 }
