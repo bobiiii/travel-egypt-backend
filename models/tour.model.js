@@ -50,7 +50,7 @@ const tourSchema = new mongoose.Schema({
 
 
   languages: { type: [String] },
-  tag: { type: String }, // add
+  tag: { type: String  ,required: true,}, // add
 
   // cancellationPolicy: { type: String },
   cardImage: { type: String },
