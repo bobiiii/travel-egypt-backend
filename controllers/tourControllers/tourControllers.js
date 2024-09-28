@@ -74,7 +74,9 @@ const addTour = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler('SubCategory Not Found', 400));
   }
 
-if (discountAmount) {
+  let childPriceAfterDiscount = 0 
+  let adultPriceAfterDiscount = 0
+if (discountAmount > 0) {
   childPriceAfterDiscount = priceChild - discountAmount,
   adultPriceAfterDiscount = priceAdult - discountAmount
 }
@@ -136,7 +138,7 @@ const [cardImageIdResolved, ...tourImagesIdsResolved] = await Promise.all([
     return next(new ErrorHandler('Unable to add tour to subcategory', 500));
   }
 
-  if (discountAmount) {
+  if (discountAmount > 0) {
     const discountedTour = await DiscountedTourModel.findOneAndUpdate(
       {}, // No filter, updates the first document or creates a new one
       { 
@@ -165,13 +167,49 @@ const updateTour = asyncHandler(async (req, res, next) => {
   const { tourId } = req.params;
   const { files } = req;
   const {
-    title, duration, description, fullDescription, strikePrice, priceAdult, priceChild, languages, tag, heading, subCategoryId,
+    title, duration, description, fullDescription, strikePrice,discountAmount, priceAdult, priceChild, languages, tag, heading, subCategoryId,
     highlightPoint, highlightId, includePoint, includePointId, includeType,  importantInfoPoint, importantInfoPointId, tourImageId
   } = req.body;
 
   let tour = await TourModel.findById(tourId);
   if (!tour) {
     return next(new ErrorHandler('Tour Not Found', 404));
+  }
+
+  if (discountAmount > 0) {
+    tour.childPriceAfterDiscount = tour.priceChild - discountAmount;
+    tour.adultPriceAfterDiscount = tour.priceAdult - discountAmount;
+    tour.discountAmount = discountAmount
+
+    const discountedTour = await DiscountedTourModel.findOne({
+      tourId: { $in: [tourId] }
+    });
+    if (!discountedTour) {
+      const newDiscountedTour = await DiscountedTourModel.findOneAndUpdate(
+        {}, 
+        { $push: { tourId: tour._id },},
+        { new: true, 
+          upsert: true }
+      );
+
+
+      if (!newDiscountedTour) {
+        return next(new ErrorHandler('Unable to add tour to discounted tours', 500));
+      }
+    } 
+  } else if( discountAmount == 0){
+    tour.discountAmount = discountAmount
+    tour.childPriceAfterDiscount = 0;
+    tour.adultPriceAfterDiscount = 0;
+    const updatedDiscountedTour = await DiscountedTourModel.findOneAndUpdate(
+      {}, // Since you have only one document
+      { $pull: { tourId: tour._id } },
+      { new: true }
+    );
+  
+    if (!updatedDiscountedTour) {
+      return next(new ErrorHandler('Unable to remove tour from discounted tours', 500));
+    }
   }
 
 
