@@ -65,6 +65,10 @@ const addTour = asyncHandler(async (req, res, next) => {
     title, duration, description, fullDescription, strikePrice, discountAmount, priceAdult, priceChild, languages, tag, heading, subCategoryId,
   } = req.body;
 
+  if (!title || !duration || !description  || !fullDescription || !priceAdult || !priceChild  || !tag || !heading || !subCategoryId )  { 
+    return next(new ErrorHandler('Please fill all required fields', 400));
+  }
+
   const includes = req?.body?.includes && JSON?.parse(req?.body?.includes);
   const highlights = req?.body?.highlights && JSON?.parse(req?.body?.highlights);
   const importantInformation = req?.body?.importantInformation && JSON?.parse(req?.body?.importantInformation);
@@ -241,10 +245,12 @@ const updateTour = asyncHandler(async (req, res, next) => {
   if (highlight) {
     highlight.point = highlightPoint || highlight.point;
 
-  } else if (includes) {
+  } 
+  if (includes) {
     includes.point = includePoint || includes.point;
     includes.type = includeType || includes.type;
-  } else if (importantInfo) {
+  } 
+   if (importantInfo) {
     importantInfo.point = importantInfoPoint || importantInfo.point;
   }
 

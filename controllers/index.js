@@ -8,6 +8,9 @@ const bstControllers = require('./bstControllers');
 const discountedTours = require('./disocuntedTourControllers');
 const popularToursControllers = require('./popularTourControllers');
 const approvedReviewController = require('./approvedReviewController');
+const   relatedToursControllers = require('./relatedToursControllers');
+
+
 
 module.exports = {
   tourControllers,
@@ -20,4 +23,5 @@ module.exports = {
   bstControllers,
   discountedTours,
   approvedReviewController,
+  relatedToursControllers,
 };

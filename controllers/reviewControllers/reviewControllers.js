@@ -1,5 +1,6 @@
 const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
-const { ReviewModel } = require('../../models');
+const { uploadImageToS3 } = require('../../middlewares/awsS3');
+const { ReviewModel, TourModel } = require('../../models');
 const { asyncHandler } = require('../../utils/asynhandler');
 const { ErrorHandler } = require('../../utils/errohandler');
 
@@ -38,30 +39,49 @@ const getReviews = asyncHandler(async (req, res, next) => {
 const addReview = asyncHandler(async (req, res, next) => {
   const {files} = req;
   const {
-    tourId, name, rating, comment, response, readMoreUrl
+    tourId, name, rating, reviewText, 
   } = req.body;
 
-  const reviewImage = files.find((item) => item.fieldname === 'imageURL');
+  const reviewImage = files.find((item) => item.fieldname === 'images');
 
-  // if (!tourId || !name || !imageURL || !rating || !comment || !response || !readMoreUrl) {
-  //   return next(new ErrorHandler('please fill all fields', 400));
-  // }
-  const reviewImageId = await uploadImageToDrive(reviewImage);
+  if (!tourId || !name  || !rating || !reviewText || !reviewImage ) {
+    return next(new ErrorHandler('please fill all fields', 500));
+  }
+
+  const tour = await TourModel.findById(tourId);
+  if (!tour) {
+    return next(new ErrorHandler('Tour not found', 404));
+  } 
+
+
+  // let imageId;
+  let reviewImages = [];
+
+  for (const file of files) {
+
+    if (file.fieldname === 'images') {
+      reviewImages.push(uploadImageToS3(file));
+      // imageId =
+    } 
+  }
+
+  // const reviewImageId = await uploadImageToDrive(reviewImage);
   const review = await ReviewModel.create({
-    tourId, name, rating, imageURL:reviewImageId , comment, response, readMoreUrl
+    tourId, name, rating, imageId:reviewImages , reviewText, 
   });
 
   if (!review) {
     return next(new ErrorHandler('Unable To Add review', 500));
   }
 
-  let tour = await CategoryModel.findById(tourId);
-  if (!tour) {
-    return next(new ErrorHandler('Category not found', 404));
-  } 
+  // const updateTourReview = await TourModel.findByIdAndUpdate(
+  //   tourId,
+  //   { $push: { tourId: review._id } }, // Push the created tour's ID into the tourId array
+  //   { new: true } // Return the updated document
+  // );
 
-  tour.reviewsId = [...tour.reviewsId, review._id];
-  await tour.save();
+  // tour.reviewsId = [...tour.reviewsId, review._id];
+  // await tour.save();
 
   return res.status(200).json({
     status: 'Success',
@@ -72,7 +92,13 @@ const addReview = asyncHandler(async (req, res, next) => {
 
 const updateReview = asyncHandler(async (req, res, next) => {
   const { reviewId } = req.params;
-  const { files } = req;
+  // const { files } = req;
+  const { response, tourId } = req.body;
+
+
+  if (!response || !tourId || !reviewId) {
+    return next(new ErrorHandler('Please Fill all required fields', 500));
+  }
 
   let review = await ReviewModel.findById(reviewId);
 
@@ -80,25 +106,25 @@ const updateReview = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler('Review not found', 404));
   }
 
-  if (files && files.length > 0) {
-    const newImage = files.find((item) => item.fieldname === 'imageURL');
-    
-    if (newImage) {
+review.response = response;
+  await review.save();
 
-      const newImageId = await updateImageOnDrive(newImage);
+  const updateTourReview = await TourModel.findByIdAndUpdate(
+    tourId,
+    { $push: { reviewsId: review._id } }, 
+    { new: true } // Return the updated document
+  );
 
-      review.imageURL = newImageId;
-    }
+
+  if (!updateTourReview) {
+    return next(new ErrorHandler('Unable to update review in tour', 500));
   }
 
-  Object.assign(review, req.body);
-
-  await review.save();
 
   return res.status(200).json({
     status: 'Success',
     message: 'Review updated successfully',
-    data: review,
+    data: updateTourReview,
   });
 });
 
@@ -110,18 +136,20 @@ const deleteReview = asyncHandler(async (req, res, next) => {
   if (!review) {
     return next(new ErrorHandler('review doesn\'t exist', 404));
   }
-  if (review.imageURL) {
-    await deleteImage(review.imageURL);
-  }
+  
 
-  await TourModel.findByIdAndUpdate(review.tourId, {
+  const removedReview = await TourModel.findByIdAndUpdate(review.tourId, {
     $pull: { reviewsId: review._id },
   });
 
+  if (!removedReview) {
+    return next(new ErrorHandler('Unable to remove review from Tour', 404));
+  }
+
   return res.status(200).json({
     status: 'Success',
-    message: 'review Deleted Successfully',
-    data: review,
+    message: 'Review Deleted Successfully',
+    data: removedReview,
   });
 });
 

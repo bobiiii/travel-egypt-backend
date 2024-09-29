@@ -5,24 +5,15 @@ const { asyncHandler } = require('../../utils/asynhandler');
 const { createSlug } = require('../../utils/createSlug');
 const { ErrorHandler } = require('../../utils/errohandler');
 
-// dummy controller , dont play with it
 const getSubCategoryWithTours = asyncHandler(async (req, res, next) => {
   const { subCategoryId } = req.params;
-  // const category = await SubCategoryModel.findOne({_id: subCategoryId }).exec();
-
-  // if (!category) {
-  //     throw new Error('Category not found');
-  //   }
-
-  // Fetch all tours related to the category
+  
   const tours = await SubCategoryModel.find({ categories: subCategoryId }).exec();
 
   return res.status(200).json(
     {
       status: 'Success',
       message: 'Request Successfull',
-
-      // category: category,
       data: tours,
 
     },
@@ -65,16 +56,24 @@ const getSubCategory = asyncHandler(async (req, res, next) => {
 const addSubCategory = asyncHandler(async (req, res, next) => {
   const { files } = req;
   const {
-    categoryId, tourId, subCategoryName,
+    categoryId,  subCategoryName, subCategoryTitle,
+    subCategoryText
   } = req.body;
   
+
   let category = await CategoryModel.findById(categoryId);
   if (!category) {
     return next(new ErrorHandler('Category not found', 404));
   } 
   
   const subCategoryImage = files.find((item) => item.fieldname === 'subCategoryImage');
-  if (!categoryId || !subCategoryName || !subCategoryImage) {
+  const subCategoryHeroImage = files.find((item) => item.fieldname === 'subCategoryHeroImage');
+  const subCaategoryMobHeroImage = files.find((item) => item.fieldname === 'subCaategoryMobHeroImage');
+  
+  
+  
+  if (!categoryId || !subCategoryName || !subCategoryImage || !subCategoryTitle ||
+    !subCategoryText) {
     return next(new ErrorHandler('please fill all fields', 400));
   }
 
@@ -82,12 +81,20 @@ const addSubCategory = asyncHandler(async (req, res, next) => {
   const sulgAuto = createSlug(subCategoryName);
 
   const subCategoryImageId = await uploadImageToS3(subCategoryImage);
+  const subCategoryHeroImageId = await uploadImageToS3(subCategoryHeroImage);
+  const subCaategoryMobHeroImageId = await uploadImageToS3(subCaategoryMobHeroImage);
+
+
   const subCategory = await SubCategoryModel.create({
     categoryId,
-    tourId,
+    
     slug: sulgAuto,
     subCategoryName,
+    subCategoryTitle,
+    subCategoryText,
     subCategoryImage: subCategoryImageId,
+    subCategoryHeroImage: subCategoryHeroImageId,
+    subCaategoryMobHeroImage: subCaategoryMobHeroImageId
   });
 
   if (!subCategory) {
@@ -101,7 +108,7 @@ const addSubCategory = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     status: 'Success',
     code: 200,
-    message: 'Add Category Successfully',
+    message: 'Subcategory added successfully',
     data: subCategory,
   });
 });
@@ -150,7 +157,7 @@ const addSubCategory = asyncHandler(async (req, res, next) => {
 
 const updateSubCategory = asyncHandler(async (req, res, next) => {
   const { subcategoryId } = req.params;
-  const { subCategoryName } = req.body;
+  const { subCategoryName, subCategoryTitle, subCategoryText } = req.body;
   const {files} = req;
   
   
@@ -161,21 +168,36 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
   
   if(files && files.length !== 0){
     const updateImage = files.find((item)=>item.fieldname === 'subCategoryImage')
+    const updateHeroImage = files.find((item)=>item.fieldname === 'subCategoryHeroImage')
+    const updateMobHeroImage = files.find((item)=>item.fieldname === 'subCaategoryMobHeroImage')
 
     if(updateImage){
       let updateImageId = await updateImageToS3(updateImage, subCategory.subCategoryImage, )
       subCategory.subCategoryImage = updateImageId;
     }
+    if(updateHeroImage){
+      let updateHeroImageId = await updateImageToS3(updateHeroImage, subCategory.subCategoryHeroImage, )
+      subCategory.subCategoryHeroImage = updateHeroImageId;
+    } 
+       if(updateMobHeroImage){
+      let updateMobHeroImageId = await updateImageToS3(updateMobHeroImage, subCategory.subCaategoryMobHeroImage, )
+      subCategory.subCaategoryMobHeroImage = updateMobHeroImageId;
+    }
   }
   
 
   if (subCategoryName && subCategoryName !== subCategory.subCategoryName) {
-    // const slugify = (subCategoryName) => subCategoryName.toLowerCase().replace(/\s+/g, '-')
     const slugAuto = createSlug(subCategoryName);
     subCategory.slug = slugAuto;
     subCategory.subCategoryName = subCategoryName 
   }
-  
+
+  if (subCategoryTitle) {
+    subCategory.subCategoryTitle = subCategoryTitle 
+  }
+  if (subCategoryText) {
+    subCategory.subCategoryText = subCategoryText 
+  }
   const  updatedata = await subCategory.save();
   
 
