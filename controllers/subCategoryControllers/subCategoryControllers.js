@@ -68,7 +68,7 @@ const addSubCategory = asyncHandler(async (req, res, next) => {
   
   const subCategoryImage = files.find((item) => item.fieldname === 'subCategoryImage');
   const subCategoryHeroImage = files.find((item) => item.fieldname === 'subCategoryHeroImage');
-  const subCaategoryMobHeroImage = files.find((item) => item.fieldname === 'subCaategoryMobHeroImage');
+  const subCategoryMobHeroImage = files.find((item) => item.fieldname === 'subCategoryMobHeroImage');
   
   
   
@@ -82,7 +82,7 @@ const addSubCategory = asyncHandler(async (req, res, next) => {
 
   const subCategoryImageId = await uploadImageToS3(subCategoryImage);
   const subCategoryHeroImageId = await uploadImageToS3(subCategoryHeroImage);
-  const subCaategoryMobHeroImageId = await uploadImageToS3(subCaategoryMobHeroImage);
+  const subCategoryMobHeroImageId = await uploadImageToS3(subCategoryMobHeroImage);
 
 
   const subCategory = await SubCategoryModel.create({
@@ -94,7 +94,7 @@ const addSubCategory = asyncHandler(async (req, res, next) => {
     subCategoryText,
     subCategoryImage: subCategoryImageId,
     subCategoryHeroImage: subCategoryHeroImageId,
-    subCaategoryMobHeroImage: subCaategoryMobHeroImageId
+    subCategoryMobHeroImage: subCategoryMobHeroImageId
   });
 
   if (!subCategory) {
@@ -169,7 +169,7 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
   if(files && files.length !== 0){
     const updateImage = files.find((item)=>item.fieldname === 'subCategoryImage')
     const updateHeroImage = files.find((item)=>item.fieldname === 'subCategoryHeroImage')
-    const updateMobHeroImage = files.find((item)=>item.fieldname === 'subCaategoryMobHeroImage')
+    const updateMobHeroImage = files.find((item)=>item.fieldname === 'subCategoryMobHeroImage')
 
     if(updateImage){
       let updateImageId = await updateImageToS3(updateImage, subCategory.subCategoryImage, )
@@ -180,8 +180,8 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
       subCategory.subCategoryHeroImage = updateHeroImageId;
     } 
        if(updateMobHeroImage){
-      let updateMobHeroImageId = await updateImageToS3(updateMobHeroImage, subCategory.subCaategoryMobHeroImage, )
-      subCategory.subCaategoryMobHeroImage = updateMobHeroImageId;
+      let updateMobHeroImageId = await updateImageToS3(updateMobHeroImage, subCategory.subCategoryMobHeroImage, )
+      subCategory.subCategoryMobHeroImage = updateMobHeroImageId;
     }
   }
   

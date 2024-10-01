@@ -104,7 +104,7 @@ const subCategorySchema = new mongoose.Schema({
   subCategoryTitle: { type: String, required: true, trim: true },
   subCategoryText: { type: String, required: true, trim: true },
   subCategoryHeroImage: { type: String, required: true, },
-  subCaategoryMobHeroImage: { type: String, required: true, },
+  subCategoryMobHeroImage: { type: String, required: true, },
 
 });
 
