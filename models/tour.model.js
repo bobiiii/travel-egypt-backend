@@ -130,7 +130,7 @@ const reviewSchema = new mongoose.Schema({
   rating: { type: Number, required: true },
   comment: { type: String, required: true },
   reviewDate: { type: Date, default: Date.now },
-  response: { type: String },
+  // response: { type: String },
   // readMoreUrl: { type: String },
 });
 
