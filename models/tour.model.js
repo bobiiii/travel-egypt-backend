@@ -40,6 +40,7 @@ const tourSchema = new mongoose.Schema({
   strikePrice: { type: Number },
   priceAdult: { type: Number, required: true, },
   priceChild: { type: Number, required: true, },
+  priceInfant: { type: Number, required: true, },
 
   childPriceAfterDiscount: {
     type: Number, default: 0, required: true,

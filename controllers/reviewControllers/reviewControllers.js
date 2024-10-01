@@ -93,10 +93,10 @@ const addReview = asyncHandler(async (req, res, next) => {
 const updateReview = asyncHandler(async (req, res, next) => {
   const { reviewId } = req.params;
   // const { files } = req;
-  const { response, tourId } = req.body;
+  const {  tourId } = req.body;
 
 
-  if (!response || !tourId || !reviewId) {
+  if (!tourId || !reviewId) {
     return next(new ErrorHandler('Please Fill all required fields', 500));
   }
 
@@ -106,8 +106,8 @@ const updateReview = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler('Review not found', 404));
   }
 
-review.response = response;
-  await review.save();
+// review.response = response;
+  // await review.save();
 
   const updateTourReview = await TourModel.findByIdAndUpdate(
     tourId,

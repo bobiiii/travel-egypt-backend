@@ -62,10 +62,10 @@ const getAllTours = asyncHandler(async (req, res, next) => {
 const addTour = asyncHandler(async (req, res, next) => {
   const { files } = req;
   const {
-    title, duration, description, fullDescription, strikePrice, discountAmount, priceAdult, priceChild, languages, tag, heading, subCategoryId,
+    title, duration, description, fullDescription, strikePrice, discountAmount, priceAdult, priceChild, priceInfant, languages, tag, heading, subCategoryId,
   } = req.body;
 
-  if (!title || !duration || !description  || !fullDescription || !priceAdult || !priceChild  || !tag || !heading || !subCategoryId )  { 
+  if (!title || !duration || !description  || !fullDescription || !priceAdult || !priceChild || !priceInfant || !tag || !heading || !subCategoryId )  { 
     return next(new ErrorHandler('Please fill all required fields', 400));
   }
 
@@ -115,6 +115,7 @@ const [cardImageIdResolved, ...tourImagesIdsResolved] = await Promise.all([
     strikePrice,
     priceAdult,
     priceChild,
+    priceInfant,
     childPriceAfterDiscount,
     adultPriceAfterDiscount,
     discountAmount,
@@ -171,7 +172,7 @@ const updateTour = asyncHandler(async (req, res, next) => {
   const { tourId } = req.params;
   const { files } = req;
   const {
-    title, duration, description, fullDescription, strikePrice,discountAmount, priceAdult, priceChild, languages, tag, heading, subCategoryId,
+    title, duration, description, fullDescription, strikePrice,discountAmount, priceAdult, priceChild, priceInfant, languages, tag, heading, subCategoryId,
     highlightPoint, highlightId, includePoint, includePointId, includeType,  importantInfoPoint, importantInfoPointId, tourImageId
   } = req.body;
 
@@ -225,6 +226,7 @@ const updateTour = asyncHandler(async (req, res, next) => {
   tour.strikePrice = strikePrice || tour.strikePrice;
   tour.priceAdult = priceAdult || tour.priceAdult;
   tour.priceChild = priceChild || tour.priceChild;
+  tour.priceInfant = priceInfant || tour.priceInfant;
   tour.languages = languages || tour.languages;
   tour.tag = tag || tour.tag;
   tour.heading = heading || tour.heading;
