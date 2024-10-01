@@ -108,6 +108,7 @@ const subCategorySchema = new mongoose.Schema({
 
 });
 
+
 const popularTourSchema = new mongoose.Schema({
   tourId: [{ type: Schema.Types.ObjectId, ref: 'Tour', required: true }],
 });
