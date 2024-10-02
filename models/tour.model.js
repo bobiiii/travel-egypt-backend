@@ -91,7 +91,8 @@ const categorySchema = new mongoose.Schema({
   categoryMobImage: { type: String, required: true, },
   bannerText: { type: String, required: true, trim: true },
   bannerSlogan: { type: String, required: true, trim: true },
-  subCategoryId: [{ type: Schema.Types.ObjectId, ref: 'SubCategory' }], // add multiple subcategory obj ids
+  subCategoryId: [{ type: Schema.Types.ObjectId, ref: 'SubCategory' }],
+  metadataId: { type: Schema.Types.ObjectId, ref: 'SubCategory' }, 
 });
 
 
@@ -162,7 +163,7 @@ const bookingSchema = new mongoose.Schema({
 
 
 
-  
+  tourName:{ type: String },
   totalAdultPrice: { type: Number },
   totalChildrenPrice: { type: Number },
   totalInfantPrice: { type: Number },
@@ -181,6 +182,20 @@ const bookingSchema = new mongoose.Schema({
 });
 
 
+const metadataSchema = new mongoose.Schema({
+  entityId: { type: mongoose.Schema.Types.ObjectId, required: true, unique: true }, // Unique ID for each entity
+  title: { type: String, trim: true },
+  description: { type: String, trim: true },
+  canonical: { type: String, trim: true },
+  ogSitename: { type: String, trim: true },
+  ogTitle: { type: String, trim: true },
+  ogDescription: { type: String, trim: true },
+  ogURL: { type: String, trim: true },
+  ogImageId: { type: String, trim: true },
+  ogImageAlt: { type: String, trim: true },
+})
+
+
 const BookingModel = mongoose.model('Booking', bookingSchema);
 const TourModel = mongoose.model('Tour', tourSchema);
 const PopularTourModel = mongoose.model('PopularTour', popularTourSchema);
@@ -191,7 +206,8 @@ const BestTourModel = mongoose.model('BestTours', bestTourSchema);
 const DiscountedTourModel = mongoose.model('DiscountedTours', discountedTourSchema);
 const BlogModel = mongoose.model('Blogs', blogSchema);
 const ApprovedReviewModel = mongoose.model('ApprovedReviews', approvedReviewSchema);
+const MetadataModel = mongoose.model('metadata', metadataSchema);
 
 module.exports = {
   TourModel, CategoryModel, SubCategoryModel, ReviewModel, BookingModel, PopularTourModel, BestTourModel, DiscountedTourModel, ApprovedReviewModel, BlogModel,
-};
+MetadataModel};

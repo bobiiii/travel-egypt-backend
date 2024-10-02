@@ -51,6 +51,7 @@ const addBooking = asyncHandler(async (req, res, next) => {
   if (!tour) {
     return next(new ErrorHandler('Tour doesn\'t exist', 404));
   }
+  const tourName =  tour.title
   const discountAmount = tour.discountAmount;
   const { priceAdult, priceChild, priceInfant } = tour;
   const totalAdultPrice = priceAdult * participants.adults;
@@ -78,7 +79,7 @@ const addBooking = asyncHandler(async (req, res, next) => {
     // status : "Pending",
     participants,
     date,
-
+    tourName,
     totalAdultPrice,
     totalChildrenPrice,
     totalInfantPrice,

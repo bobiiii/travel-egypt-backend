@@ -1,5 +1,6 @@
 const {
     getMetadata,
+    getAllMetadata,
     addMetadata,
     updateMetadata,
     deleteMetadata,
@@ -7,6 +8,7 @@ const {
 
 module.exports = {
     getMetadata,
+    getAllMetadata,
     addMetadata,
     updateMetadata,
     deleteMetadata,

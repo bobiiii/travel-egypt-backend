@@ -20,7 +20,7 @@ publicRoute.get('/get-discountedtours', discountedTours.getAllDiscountTours);
 publicRoute.get('/get-popular-tours', popularToursControllers.getAllPopularTours);
 publicRoute.get('/get-related-tours', relatedToursControllers.getAllRelatedTours);
 publicRoute.post('/add-booking', bookingControllers.addBooking);
-publicRoute.get('/get-metadata/:metadataId', metadataControllers.getMetadata);;
+publicRoute.get('/get-metadata/:entityId', metadataControllers.getMetadata);;
 
 // publicRoute.get('/get-all-bookings', relatedToursControllers.getAllRelatedTours);
 // publicRoute.get('/update-bookings', relatedToursControllers.getAllRelatedTours);
