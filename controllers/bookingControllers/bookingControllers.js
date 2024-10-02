@@ -51,15 +51,16 @@ const addBooking = asyncHandler(async (req, res, next) => {
   if (!tour) {
     return next(new ErrorHandler('Tour doesn\'t exist', 404));
   }
+  const discountAmount = tour.discountAmount;
   const { priceAdult, priceChild, priceInfant } = tour;
   const totalAdultPrice = priceAdult * participants.adults;
   const totalChildrenPrice = priceChild * participants.children;
   const totalInfantPrice = priceInfant * participants.infant;
+
   const discountAdultPrice = participants.adults ? totalAdultPrice - (participants.adults * discountAmount) : 0
   const discountChildPrice = participants.children  ? totalChildrenPrice - (participants.children * discountAmount) : 0
   const discountInfantPrice =participants.infant ? totalInfantPrice - (participants.infant * discountAmount) : 0
 
-  const discountAmount = tour.discountAmount;
   const totalPrice = totalAdultPrice + totalChildrenPrice + totalInfantPrice
   const totalPriceAfterDiscount = discountAdultPrice + discountChildPrice + discountInfantPrice
 
@@ -74,7 +75,7 @@ const addBooking = asyncHandler(async (req, res, next) => {
     name,
     phoneNumber,
     language,
-    status : "Pending",
+    // status : "Pending",
     participants,
     date,
 
@@ -101,7 +102,9 @@ const addBooking = asyncHandler(async (req, res, next) => {
 
 const updateBooking = asyncHandler(async (req, res, next) => {
   const { bookingId } = req.params;
-  const booking = await BookingModel.findByIdAndUpdate(bookingId, req.body, { new: true });
+  const {status} = req.body
+  
+  const booking = await BookingModel.findByIdAndUpdate(bookingId, {status}, { new: true });
 
   if (!booking) {
     return next(new ErrorHandler('Booking doesn\'t exist', 404));

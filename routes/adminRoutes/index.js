@@ -22,6 +22,7 @@ adminRoutes.use('/discountedtour', discounrtedTourRoute);
 adminRoutes.use('/populartour', popularTourRoute);
 adminRoutes.use('/approvedreview', approvedReview)
 adminRoutes.use('/metadata', metadataRoute)
+adminRoutes.use('/booking', bookingRoute)
 
 adminRoutes.use('/*', (req, res) => {
   res.status(404).json({ message: 'Route Not Found' });

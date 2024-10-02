@@ -176,7 +176,7 @@ const bookingSchema = new mongoose.Schema({
   totalPrice: { type: Number },
   totalPriceAfterDiscount:{ type: Number },
 
-  status: { type: String, default: 'pending', enum: ['pending', 'confirmed', 'cancelled'] },
+  status: { type: String, default: 'Pending', enum: ['Pending', 'Confirmed', 'Cancelled'] },
   bookingDate: { type: Date, default: Date.now },
 });
 
