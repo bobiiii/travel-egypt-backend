@@ -1,6 +1,8 @@
 const express = require('express');
 const {
   tourControllers, categoryControllers, subCategoryControllers, reviewControllers, popularToursControllers, relatedToursControllers, bstControllers, discountedTours,
+  bookingControllers,
+  metadataControllers,
 } = require('../../controllers');
 
 const publicRoute = express.Router();
@@ -17,6 +19,12 @@ publicRoute.get('/get-besttours', bstControllers.getAllBestTours);
 publicRoute.get('/get-discountedtours', discountedTours.getAllDiscountTours);
 publicRoute.get('/get-popular-tours', popularToursControllers.getAllPopularTours);
 publicRoute.get('/get-related-tours', relatedToursControllers.getAllRelatedTours);
+publicRoute.post('/add-booking', bookingControllers.addBooking);
+publicRoute.get('/get-metadata/:metadataId', metadataControllers.getMetadata);;
+
+// publicRoute.get('/get-all-bookings', relatedToursControllers.getAllRelatedTours);
+// publicRoute.get('/update-bookings', relatedToursControllers.getAllRelatedTours);
+// publicRoute.get('/get-booking', relatedToursControllers.getAllRelatedTours);
 
 // publicRoute.get('/category/:categoryId', categoryControllers.getCategoryWithTours);
 // tourRoute.get('/get-all-tours', tourControllers.getAllTours);

@@ -7,7 +7,8 @@ const subCategoryRoute = require('./subCategoryRoutes');
 const bestTourRoute = require('./bestTourRoutes');
 const discounrtedTourRoute = require('./discontedTourRoutes');
 const popularTourRoute = require('./popularTourRoutes');
-const approvedReview = require('./approvedReviewRoute')
+const approvedReview = require('./approvedReviewRoute');
+const metadataRoute = require('./metadataRoutes');
 
 const adminRoutes = express.Router();
 
@@ -19,7 +20,8 @@ adminRoutes.use('/subcategory', subCategoryRoute);
 adminRoutes.use('/besttour', bestTourRoute);
 adminRoutes.use('/discountedtour', discounrtedTourRoute);
 adminRoutes.use('/populartour', popularTourRoute);
-adminRoutes.use('approvedreview', approvedReview)
+adminRoutes.use('/approvedreview', approvedReview)
+adminRoutes.use('/metadata', metadataRoute)
 
 adminRoutes.use('/*', (req, res) => {
   res.status(404).json({ message: 'Route Not Found' });

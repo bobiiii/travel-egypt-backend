@@ -24,7 +24,7 @@ const getBooking = asyncHandler(async (req, res, next) => {
 const getAllBookings = asyncHandler(async (req, res, next) => {
   const bookings = await BookingModel.find({}).exec();
 
-  if (bookings.length === 0) {
+  if (!bookings.length ) {
     return next(new ErrorHandler('no bookings found', 404));
   }
 
@@ -43,7 +43,7 @@ const addBooking = asyncHandler(async (req, res, next) => {
     tourId, participants, date, language, name, phoneNumber, email,
   } = req.body;
 
-  if (tourId === '' || participants === '' || date === '' || language === '' || name === '' || phoneNumber === '' || email === '') {
+  if (!tourId || !participants || !date || !language || !name || !phoneNumber || !email) {
     return next(new ErrorHandler('please fill all fileds', 400));
   }
 
@@ -51,14 +51,43 @@ const addBooking = asyncHandler(async (req, res, next) => {
   if (!tour) {
     return next(new ErrorHandler('Tour doesn\'t exist', 404));
   }
-  const { price } = tour;
-  const totalPrice = price * (participants.adults + participants.children);
+  const { priceAdult, priceChild, priceInfant } = tour;
+  const totalAdultPrice = priceAdult * participants.adults;
+  const totalChildrenPrice = priceChild * participants.children;
+  const totalInfantPrice = priceInfant * participants.infant;
+  const discountAdultPrice = participants.adults ? totalAdultPrice - (participants.adults * discountAmount) : 0
+  const discountChildPrice = participants.children  ? totalChildrenPrice - (participants.children * discountAmount) : 0
+  const discountInfantPrice =participants.infant ? totalInfantPrice - (participants.infant * discountAmount) : 0
+
+  const discountAmount = tour.discountAmount;
+  const totalPrice = totalAdultPrice + totalChildrenPrice + totalInfantPrice
+  const totalPriceAfterDiscount = discountAdultPrice + discountChildPrice + discountInfantPrice
+
 
   const bookingData = {
     ...req.body,
     totalPrice,
   };
-  const booking = await BookingModel.create(bookingData);
+  const booking = await BookingModel.create({
+    tourId,
+    email,
+    name,
+    phoneNumber,
+    language,
+    status : "Pending",
+    participants,
+    date,
+
+    totalAdultPrice,
+    totalChildrenPrice,
+    totalInfantPrice,
+    discountAdultPrice,
+    discountChildPrice,
+    discountInfantPrice,
+    totalPrice,
+    discountAmount,
+    totalPriceAfterDiscount
+  });
 
   if (!booking) {
     return next(new ErrorHandler('Unable To add Booking', 500));

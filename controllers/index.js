@@ -9,6 +9,7 @@ const discountedTours = require('./disocuntedTourControllers');
 const popularToursControllers = require('./popularTourControllers');
 const approvedReviewController = require('./approvedReviewController');
 const   relatedToursControllers = require('./relatedToursControllers');
+const   metadataControllers = require('./metadataControllers');
 
 
 
@@ -24,4 +25,5 @@ module.exports = {
   discountedTours,
   approvedReviewController,
   relatedToursControllers,
+  metadataControllers,
 };

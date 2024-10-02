@@ -72,6 +72,7 @@ const addTour = asyncHandler(async (req, res, next) => {
   const includes = req?.body?.includes && JSON?.parse(req?.body?.includes);
   const highlights = req?.body?.highlights && JSON?.parse(req?.body?.highlights);
   const importantInformation = req?.body?.importantInformation && JSON?.parse(req?.body?.importantInformation);
+console.log("importantInformation ", importantInformation);
 
   const subCategory = await SubCategoryModel.findById(subCategoryId);
   if (!subCategory) {

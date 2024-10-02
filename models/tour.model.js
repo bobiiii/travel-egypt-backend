@@ -21,13 +21,14 @@ const includesSchema = new mongoose.Schema({
 
 const highlightsSchema = new mongoose.Schema({
   _id: { type: Schema.ObjectId, auto: true },
-  point: { type: String, required: true , trim: true},
+  points: { type: String, required: true , trim: true},
 });
 
-const importantInformationSchema = new mongoose.Schema({
+const importantInformationSchema = new mongoose.Schema([{
   _id: { type: Schema.ObjectId, auto: true },
-  point: { type: String, required: true, trim: true },
-});
+  heading: { type: String, required: true, trim: true },
+  points: { type: [String], required: true, trim: true },
+}]);
 
 
 const tourSchema = new mongoose.Schema({
@@ -148,16 +149,32 @@ const blogSchema = new mongoose.Schema({
 
 const bookingSchema = new mongoose.Schema({
   tourId: { type: Schema.Types.ObjectId, ref: 'Tour', required: true },
+  name: { type: String , required: true},
+  email: { type: String , required: true},
+  phoneNumber: { type: String , required: true},
+  language: { type: String, required: true },
   participants: {
-    adults: { type: Number },
-    children: { type: Number },
+    adults: { type: Number , required: true},
+    children: { type: Number , required: true},
+    infant: { type: Number , required: true},
   },
+  date: { type: Date , required: true},
+
+
+
+  
+  totalAdultPrice: { type: Number },
+  totalChildrenPrice: { type: Number },
+  totalInfantPrice: { type: Number },
+  discountAdultPrice: { type: Number },
+  discountChildPrice: { type: Number },
+  discountInfantPrice: { type: Number },
+  discountAmount: {
+    type: Number, required: true,
+  },
+  
   totalPrice: { type: Number },
-  date: { type: Date },
-  language: { type: String },
-  name: { type: String },
-  phoneNumber: { type: String },
-  email: { type: String },
+  totalPriceAfterDiscount:{ type: Number },
 
   status: { type: String, default: 'pending', enum: ['pending', 'confirmed', 'cancelled'] },
   bookingDate: { type: Date, default: Date.now },
