@@ -63,7 +63,7 @@ const tourSchema = new mongoose.Schema({
   // tourImagesFront: { type: [String] },
   highlights: { type: [highlightsSchema] },
   includes: { type: [includesSchema] },
-  heading: { type: String, required: true,  trim: true },
+  // heading: { type: String, required: true,  trim: true },
   importantInformation: { type: [importantInformationSchema] },
   subCategoryId: { type: Schema.Types.ObjectId, ref: 'SubCategory', required: true },
   reviewsId: [{ type: Schema.Types.ObjectId, ref: 'Review' }],

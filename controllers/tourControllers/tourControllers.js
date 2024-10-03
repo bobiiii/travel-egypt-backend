@@ -62,10 +62,10 @@ const getAllTours = asyncHandler(async (req, res, next) => {
 const addTour = asyncHandler(async (req, res, next) => {
   const { files } = req;
   const {
-    title, duration, description, fullDescription, strikePrice, discountAmount, priceAdult, priceChild, priceInfant, languages, tag, heading, subCategoryId,
+    title, duration, description, fullDescription, strikePrice, discountAmount, priceAdult, priceChild, priceInfant, languages, tag,  subCategoryId,
   } = req.body;
 
-  if (!title || !duration || !description  || !fullDescription || !priceAdult || !priceChild || !priceInfant || !tag || !heading || !subCategoryId )  { 
+  if (!title || !duration || !description  || !fullDescription || !priceAdult || !priceChild || !priceInfant || !tag  || !subCategoryId )  { 
     return next(new ErrorHandler('Please fill all required fields', 400));
   }
 
@@ -124,7 +124,7 @@ const [cardImageIdResolved, ...tourImagesIdsResolved] = await Promise.all([
     tag,
     highlights,
     includes,
-    heading,
+    // heading,
     importantInformation,
     subCategoryId,
     
@@ -173,8 +173,8 @@ const updateTour = asyncHandler(async (req, res, next) => {
   const { tourId } = req.params;
   const { files } = req;
   const {
-    title, duration, description, fullDescription, strikePrice,discountAmount, priceAdult, priceChild, priceInfant, languages, tag, heading, subCategoryId,
-    highlightPoint, highlightId, includePoint, includePointId, includeType,  importantInfoPoint, importantInfoPointId, tourImageId
+    title, duration, description, fullDescription, strikePrice,discountAmount, priceAdult, priceChild, priceInfant, languages, tag,  subCategoryId,
+    highlightPoint, highlightId, includePoint, includePointId, includeType, importantInfoId,  importantInfoPoint, importantInfoHeading, tourImageId
   } = req.body;
 
   let tour = await TourModel.findById(tourId);
@@ -219,6 +219,22 @@ const updateTour = asyncHandler(async (req, res, next) => {
   }
 
 
+  if (importantInfoId) {
+    tour.importantInformation = tour.importantInformation.map(info => {
+      // If the current object's id matches the importantInfoId, update it
+      if (info._id == importantInfoId) {
+        return {
+          ...info,
+          heading: importantInfoHeading || info.heading ,  // Update heading
+          points: importantInfoPoint ||   info.points  // Update points
+        };
+      }
+      return info; // Return the object unchanged if ids don't match
+    });    
+  }
+
+
+
 
   // Update non-image fields
   tour.duration = duration || tour.duration;
@@ -230,7 +246,7 @@ const updateTour = asyncHandler(async (req, res, next) => {
   tour.priceInfant = priceInfant || tour.priceInfant;
   tour.languages = languages || tour.languages;
   tour.tag = tag || tour.tag;
-  tour.heading = heading || tour.heading;
+  // tour.heading = heading || tour.heading;
   tour.subCategoryId = subCategoryId || tour.subCategoryId;
   
   
@@ -243,19 +259,19 @@ const updateTour = asyncHandler(async (req, res, next) => {
 
   const highlight = tour.highlights.find(h => h._id.toString() === highlightId);
   const includes = tour.includes.find(h => h._id.toString() === includePointId);
-  const importantInfo = tour.importantInformation.find(h => h._id.toString() === importantInfoPointId);
+  // const importantInfo = tour.importantInformation.find(h => h._id.toString() === importantInfoPointId);
 
   if (highlight) {
-    highlight.point = highlightPoint || highlight.point;
+    highlight.points = highlightPoint || highlight.points;
 
   } 
   if (includes) {
     includes.point = includePoint || includes.point;
     includes.type = includeType || includes.type;
   } 
-   if (importantInfo) {
-    importantInfo.point = importantInfoPoint || importantInfo.point;
-  }
+  //  if (importantInfo) {
+  //   importantInfo.point = importantInfoPoint || importantInfo.point;
+  // }
 
 
   if (files && files.length !== 0) {
