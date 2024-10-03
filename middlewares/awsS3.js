@@ -1,4 +1,6 @@
 const { S3Client, UploadCommand, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
+const { CloudFrontClient, CreateInvalidationCommand } = require("@aws-sdk/client-cloudfront");
+
 const { v4: uuidv4 } = require('uuid');
 
 const s3Client = new S3Client({
@@ -36,26 +38,40 @@ const uploadImageToS3 = async (image) => {
 
 
 
+
 const updateImageToS3 = async (image, existingImageKey) => {
-    const params = {
+  const s3Params = {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: existingImageKey,
       Body: image.buffer,
       ContentType: image.mimetype,
-    };
-  
-    try {
-      // Overwrite existing image
- await s3Client.send(new PutObjectCommand(params));
-
-  
-      return  existingImageKey
-    //   return `https://${process.env.AWS_BUCKET_NAME}.s3.${s3Client.config.region}.amazonaws.com/${existingImageKey}`;
-    } catch (err) {
-      console.error(err);
-      throw new Error('Error updating image to S3');
-    }
   };
+
+  try {
+      // Overwrite existing image in S3
+      await s3Client.send(new PutObjectCommand(s3Params));
+
+      // Invalidate the CloudFront cache for the updated image
+      const cloudfrontClient = new CloudFrontClient();
+      const cloudfrontParams = {
+          DistributionId: process.env.AWS_CLOUDFRONT_DISTRIBUTION_ID, // Your CloudFront distribution ID
+          InvalidationBatch: {
+              CallerReference: `invalidate-${Date.now()}`, // Unique string to ensure the request is unique
+              Paths: {
+                  Quantity: 1,
+                  Items: [`/${existingImageKey}`], // Path to the image to invalidate (starting with /)
+              },
+          },
+      };
+
+      await cloudfrontClient.send(new CreateInvalidationCommand(cloudfrontParams));
+
+      return existingImageKey;
+  } catch (err) {
+      console.error(err);
+      throw new Error('Error updating image and invalidating CloudFront cache');
+  }
+};
 
 
   const deleteObjectFromS3 = async (imageKey) => {
