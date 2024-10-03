@@ -280,9 +280,13 @@ const updateTour = asyncHandler(async (req, res, next) => {
         await updateImageToS3( file, tour.cardImage,);
       } else if (file.fieldname === 'tourImage') {
         await updateImageToS3( file, tourImageId);
+      }else if (file.fieldname === 'newtourImages') {
+         const newImageId = await uploadImageToS3( file);
+         tour.tourImages.push(newImageId)
       }
     }
   }
+
 
   const updatedTour = await tour.save();
 
