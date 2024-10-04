@@ -26,11 +26,14 @@ if (!entityId) {
 
 
 const getAllMetadata = asyncHandler(async (req, res, next) => {
-    
-    
-        const metadata = await MetadataModel.find();
+    const { entityType } = req.query;
+    if (!entityType) {
+        return next(new ErrorHandler('Please provide entity type', 400));
+    }
+
+        const metadata = await MetadataModel.find({entityType});
         if (!metadata) {
-            return next(new ErrorHandler('No metadata found  ', 400));
+            return next(new ErrorHandler('No metadata found', 400));
         }
     
         return res.status(200).json({
@@ -42,7 +45,7 @@ const getAllMetadata = asyncHandler(async (req, res, next) => {
 
 const addMetadata = asyncHandler(async (req, res, next) => {
     const { files } = req
-    const { entityId, title,
+    const { entityId, entityType, title,
         description,
         canonical,
         ogSitename,
@@ -53,7 +56,7 @@ const addMetadata = asyncHandler(async (req, res, next) => {
     } = req.body;
 
 
-    if (!entityId  || !title || !description  || !canonical || !ogSitename || !ogTitle || !ogDescription || !ogURL || !ogImageAlt   ) {
+    if (!entityId || !entityType || !title || !description  || !canonical || !ogSitename || !ogTitle || !ogDescription || !ogURL || !ogImageAlt   ) {
         return next(new ErrorHandler('Please fill all required fields  ', 400));
 
     }
@@ -81,6 +84,7 @@ const addMetadata = asyncHandler(async (req, res, next) => {
     }
     const metadata = await MetadataModel.create({
         entityId,
+        entityType,
         title,
          description,
             canonical,
