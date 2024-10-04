@@ -1,5 +1,5 @@
-const { getReviews, addReview, updateReview, deleteReview, getApprovedReviews } = require("./reviewControllers")
+const { getReviews, addReview, updateReview, deleteReview, getReviewsByStatus } = require("./reviewControllers")
 
 module.exports = {
-    getReviews, addReview, updateReview, deleteReview, getApprovedReviews
+    getReviews, addReview, updateReview, deleteReview, getReviewsByStatus
 }

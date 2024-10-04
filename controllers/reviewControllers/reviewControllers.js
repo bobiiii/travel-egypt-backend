@@ -5,10 +5,10 @@ const { asyncHandler } = require('../../utils/asynhandler');
 const { ErrorHandler } = require('../../utils/errohandler');
 
 const getReviews = asyncHandler(async (req, res, next) => {
-  const reviews = await ReviewModel.find({});
+  const reviews = await ReviewModel.find({status:"Approved"});
 
   if (reviews.length === 0) {
-    return next(new ErrorHandler('no reviews found', 404));
+    return next(new ErrorHandler('No approved reviews found', 404));
   }
 
   return res.status(200).json(
@@ -20,11 +20,18 @@ const getReviews = asyncHandler(async (req, res, next) => {
   );
 });
 
-  const getApprovedReviews = asyncHandler(async (req, res, next) => {
-    const reviews = await ReviewModel.find({isApproved: 'approved'});
+  const getReviewsByStatus = asyncHandler(async (req, res, next) => {
+    const {status} = req.query;
+
+    if (!status) {
+      return next(new ErrorHandler('Please filter by status', 404));
+    }
+
+    
+    const reviews = await ReviewModel.find({status});
   
     if (reviews.length === 0) {
-      return next(new ErrorHandler('no approved reviews found', 404));
+      return next(new ErrorHandler(`No ${status} reviews found`, 404));
     }
   
     return res.status(200).json(
@@ -86,19 +93,20 @@ const addReview = asyncHandler(async (req, res, next) => {
 
   return res.status(200).json({
     status: 'Success',
-    message: 'Add review Successfully',
+    message: 'Review Added Successfully',
     data: review,
   });
 });
 
 const updateReview = asyncHandler(async (req, res, next) => {
   const { reviewId } = req.params;
+  const {status} = req.body
   // const { files } = req;
   // const {  tourId } = req.body;
 
 
-  if (!reviewId) {
-    return next(new ErrorHandler('Please Fill all required fields', 500));
+  if (!reviewId || !status) {
+    return next(new ErrorHandler('Please review Id and Status', 500));
   }
 
   let review = await ReviewModel.findById(reviewId);
@@ -107,15 +115,27 @@ const updateReview = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler('Review not found', 404));
   }
 
-// review.response = response;
-  // await review.save();
+review.status = status;
+  await review.save();
 
-  const updateTourReview = await TourModel.findByIdAndUpdate(
+
+  let updateTourReview
+if (status == "Pending" || status == "Rejected" ) {
+   updateTourReview = await TourModel.findByIdAndUpdate(
+    review.tourId,
+    { $pull: { reviewsId: review._id } }, 
+    { new: true } // Return the updated document
+  );  
+}else if (status == "Approved") {
+  updateTourReview = await TourModel.findByIdAndUpdate(
     review.tourId,
     { $push: { reviewsId: review._id } }, 
     { new: true } // Return the updated document
   );
+}
 
+
+  
 
   if (!updateTourReview) {
     return next(new ErrorHandler('Unable to update review in tour', 500));
@@ -155,5 +175,5 @@ const deleteReview = asyncHandler(async (req, res, next) => {
 });
 
 module.exports = {
-  getReviews, addReview, updateReview, deleteReview, getApprovedReviews,
+  getReviews, addReview, updateReview, deleteReview, getReviewsByStatus,
 };

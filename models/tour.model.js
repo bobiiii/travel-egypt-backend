@@ -139,6 +139,7 @@ const reviewSchema = new mongoose.Schema({
   // imageId: { type: [String], required: true },
   rating: { type: Number, required: true },
   reviewText: { type: String, required: true },
+  status: { type: String, default: 'Pending', enum: ['Approved', 'Rejected', "Pending"] },
   reviewDate: { type: Date, default: Date.now },
   // response: { type: String },
   // readMoreUrl: { type: String },
