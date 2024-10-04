@@ -39,12 +39,12 @@ const getReviews = asyncHandler(async (req, res, next) => {
 const addReview = asyncHandler(async (req, res, next) => {
   const {files} = req;
   const {
-    tourId, name, rating, reviewText, 
+    tourId, tourName, name, rating, reviewText, 
   } = req.body;
 
   const reviewImage = files.find((item) => item.fieldname === 'images');
 
-  if (!tourId || !name  || !rating || !reviewText || !reviewImage ) {
+  if (!tourId || !tourName  || !name  || !rating || !reviewText || !reviewImage ) {
     return next(new ErrorHandler('please fill all fields', 500));
   }
 
@@ -67,7 +67,7 @@ const addReview = asyncHandler(async (req, res, next) => {
 
   // const reviewImageId = await uploadImageToDrive(reviewImage);
   const review = await ReviewModel.create({
-    tourId, name, rating, imageId:reviewImages , reviewText, 
+    tourId, tourName, name, rating, imageId:reviewImages , reviewText, 
   });
 
   if (!review) {
@@ -93,10 +93,10 @@ const addReview = asyncHandler(async (req, res, next) => {
 const updateReview = asyncHandler(async (req, res, next) => {
   const { reviewId } = req.params;
   // const { files } = req;
-  const {  tourId } = req.body;
+  // const {  tourId } = req.body;
 
 
-  if (!tourId || !reviewId) {
+  if (!reviewId) {
     return next(new ErrorHandler('Please Fill all required fields', 500));
   }
 
@@ -110,7 +110,7 @@ const updateReview = asyncHandler(async (req, res, next) => {
   // await review.save();
 
   const updateTourReview = await TourModel.findByIdAndUpdate(
-    tourId,
+    review.tourId,
     { $push: { reviewsId: review._id } }, 
     { new: true } // Return the updated document
   );

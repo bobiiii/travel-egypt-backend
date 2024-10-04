@@ -128,6 +128,7 @@ const discountedTourSchema = new mongoose.Schema({
 
 const reviewSchema = new mongoose.Schema({
   tourId: { type: Schema.Types.ObjectId, ref: 'Tour', required: true },
+ tourName: { type: String, required: true },
   name: { type: String, required: true },
   imageId: { type: [String], required: true },
   rating: { type: Number, required: true },
