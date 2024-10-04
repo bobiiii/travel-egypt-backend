@@ -129,10 +129,16 @@ const discountedTourSchema = new mongoose.Schema({
 const reviewSchema = new mongoose.Schema({
   tourId: { type: Schema.Types.ObjectId, ref: 'Tour', required: true },
  tourName: { type: String, required: true },
-  name: { type: String, required: true },
-  imageId: { type: [String], required: true },
+
+ firstName:{ type: String, required: true },
+  lastName:{ type: String, required: true } ,
+  phone:{ type: String, required: true } ,
+  email:{ type: String, required: true },
+
+  // name: { type: String, required: true },
+  // imageId: { type: [String], required: true },
   rating: { type: Number, required: true },
-  comment: { type: String, required: true },
+  reviewText: { type: String, required: true },
   reviewDate: { type: Date, default: Date.now },
   // response: { type: String },
   // readMoreUrl: { type: String },

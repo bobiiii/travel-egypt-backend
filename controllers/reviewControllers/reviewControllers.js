@@ -39,12 +39,12 @@ const getReviews = asyncHandler(async (req, res, next) => {
 const addReview = asyncHandler(async (req, res, next) => {
   const {files} = req;
   const {
-    tourId, tourName, name, rating, reviewText, 
+    tourId, tourName, firstName ,lastName ,phone  ,email, rating, reviewText, 
   } = req.body;
 
   const reviewImage = files.find((item) => item.fieldname === 'images');
 
-  if (!tourId || !tourName  || !name  || !rating || !reviewText || !reviewImage ) {
+  if (!tourId || !tourName  || !firstName || !lastName ||!phone || !email  || !rating || !reviewText ) {
     return next(new ErrorHandler('please fill all fields', 500));
   }
 
@@ -55,19 +55,20 @@ const addReview = asyncHandler(async (req, res, next) => {
 
 
   // let imageId;
-  let reviewImages = [];
+  // let reviewImages = [];
 
-  for (const file of files) {
+  // for (const file of files) {
 
-    if (file.fieldname === 'images') {
-      reviewImages.push(uploadImageToS3(file));
-      // imageId =
-    } 
-  }
+  //   if (file.fieldname === 'images') {
+  //     reviewImages.push(uploadImageToS3(file));
+  //     // imageId =
+  //   } 
+  // }
 
-  // const reviewImageId = await uploadImageToDrive(reviewImage);
+
+ // const reviewImageId = await uploadImageToDrive(reviewImage);
   const review = await ReviewModel.create({
-    tourId, tourName, name, rating, imageId:reviewImages , reviewText, 
+    tourId, tourName, firstName ,lastName ,phone ,email, rating , reviewText, 
   });
 
   if (!review) {
