@@ -44,12 +44,12 @@ const getReviews = asyncHandler(async (req, res, next) => {
   });
 
 const addReview = asyncHandler(async (req, res, next) => {
-  const {files} = req;
+  // const {files} = req;
   const {
     tourId, tourName, firstName ,lastName ,phone  ,email, rating, reviewText, 
   } = req.body;
 
-  const reviewImage = files.find((item) => item.fieldname === 'images');
+  // const reviewImage = files.find((item) => item.fieldname === 'images');
 
   if (!tourId || !tourName  || !firstName || !lastName ||!phone || !email  || !rating || !reviewText ) {
     return next(new ErrorHandler('please fill all fields', 500));
