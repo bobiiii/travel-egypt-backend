@@ -14,6 +14,7 @@ publicRoute.get('/get-category/:slug', categoryControllers.getCategory);
 publicRoute.get('/get-all-subcategories', subCategoryControllers.getAllSubCategories);
 publicRoute.get('/get-subcategories/:slug', subCategoryControllers.getSubCategory);
 publicRoute.get('/get-reviews', reviewControllers.getReviews);
+publicRoute.get('/add-review', reviewControllers.addReview);
 // publicRoute.get('/get-reviews-status', reviewControllers.getReviewsByStatus);
 publicRoute.get('/get-besttours', bstControllers.getAllBestTours);
 publicRoute.get('/get-discountedtours', discountedTours.getAllDiscountTours);
