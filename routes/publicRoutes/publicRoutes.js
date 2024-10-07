@@ -2,6 +2,7 @@ const express = require('express');
 const {
   tourControllers, categoryControllers, subCategoryControllers, reviewControllers, popularToursControllers, relatedToursControllers, bstControllers, discountedTours,
   bookingControllers,
+  messageControllers,
   metadataControllers,
 } = require('../../controllers');
 
@@ -21,6 +22,7 @@ publicRoute.get('/get-discountedtours', discountedTours.getAllDiscountTours);
 publicRoute.get('/get-popular-tours', popularToursControllers.getAllPopularTours);
 publicRoute.get('/get-related-tours', relatedToursControllers.getAllRelatedTours);
 publicRoute.post('/add-booking', bookingControllers.addBooking);
+publicRoute.post('/send-message', messageControllers.addMessage);
 publicRoute.get('/get-metadata/:entityId', metadataControllers.getMetadata);;
 
 // publicRoute.get('/get-all-bookings', relatedToursControllers.getAllRelatedTours);

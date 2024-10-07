@@ -1,5 +1,5 @@
 const {
-  TourModel, CategoryModel, SubCategoryModel, ReviewModel, BookingModel, PopularTourModel, BestTourModel, DiscountedTourModel, ApprovedReviewModel,
+  TourModel, CategoryModel, SubCategoryModel, ReviewModel, BookingModel, PopularTourModel, BestTourModel, DiscountedTourModel, ApprovedReviewModel, MessageModel,
 } = require('./tour.model');
 
 module.exports = {
@@ -12,5 +12,6 @@ module.exports = {
   BestTourModel,
   DiscountedTourModel,
   ApprovedReviewModel,
+  MessageModel,
 };
 // a
