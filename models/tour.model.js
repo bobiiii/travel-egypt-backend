@@ -219,6 +219,17 @@ const messageSchema = new mongoose.Schema({
 })
 
 
+const userSchema = new mongoose.Schema({
+  name: { type: String , required: true, trim: true},
+  email: { type: String , required: true, trim: true},
+  password: { type: String , required: true, trim: true},
+  // role: { type: Date, default: Date.now },
+})
+
+
+
+
+
 const BookingModel = mongoose.model('Booking', bookingSchema);
 const TourModel = mongoose.model('Tour', tourSchema);
 const PopularTourModel = mongoose.model('PopularTour', popularTourSchema);
@@ -231,7 +242,9 @@ const BlogModel = mongoose.model('Blogs', blogSchema);
 const ApprovedReviewModel = mongoose.model('ApprovedReviews', approvedReviewSchema);
 const MetadataModel = mongoose.model('metadata', metadataSchema);
 const MessageModel = mongoose.model('messages', messageSchema);
+const UserModel = mongoose.model('user', userSchema);
+
 
 module.exports = {
   TourModel, CategoryModel, SubCategoryModel, ReviewModel, BookingModel, PopularTourModel, BestTourModel, DiscountedTourModel, ApprovedReviewModel, BlogModel,
-MetadataModel, MessageModel};
+MetadataModel, MessageModel, UserModel};

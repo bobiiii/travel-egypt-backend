@@ -11,6 +11,7 @@ const approvedReviewController = require('./approvedReviewController');
 const   relatedToursControllers = require('./relatedToursControllers');
 const   metadataControllers = require('./metadataControllers');
 const   messageControllers = require('./messageControllers');
+const   userControllers = require('./userControllerss');
 
 
 
@@ -27,5 +28,6 @@ module.exports = {
   approvedReviewController,
   relatedToursControllers,
   metadataControllers,
-  messageControllers
+  messageControllers,
+  userControllers,
 };

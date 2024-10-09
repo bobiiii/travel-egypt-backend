@@ -4,10 +4,12 @@ const {
   bookingControllers,
   messageControllers,
   metadataControllers,
+  userControllers,
 } = require('../../controllers');
 
 const publicRoute = express.Router();
 
+publicRoute.get('/admin/login', userControllers.loginUserController);
 publicRoute.get('/get-tour/:slug', tourControllers.getTour);
 publicRoute.get('/get-all-tours', tourControllers.getAllTours);
 publicRoute.get('/get-all-categories', categoryControllers.getAllCategories);

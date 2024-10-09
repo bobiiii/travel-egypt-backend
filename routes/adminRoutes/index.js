@@ -10,9 +10,11 @@ const popularTourRoute = require('./popularTourRoutes');
 const approvedReview = require('./approvedReviewRoute');
 const metadataRoute = require('./metadataRoutes');
 const messageRoute = require('./messageRoutes');
+const userRoute = require('./userRoutes');
 
 const adminRoutes = express.Router();
 
+adminRoutes.use('/user/', userRoute);
 adminRoutes.use('/tour', tourRoute);
 adminRoutes.use('/category', categoryRoute);
 adminRoutes.use('/review', reviewRoute);
