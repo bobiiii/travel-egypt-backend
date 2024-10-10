@@ -115,7 +115,7 @@ if (status == "Pending" || status == "Rejected" ) {
 }else if (status == "Approved") {
   updateTourReview = await TourModel.findByIdAndUpdate(
     review.tourId,
-    { $push: { reviewsId: review._id } }, 
+    { $addToSet: { reviewsId: review._id } }, 
     { new: true } // Return the updated document
   );
 }
@@ -131,7 +131,7 @@ if (status == "Pending" || status == "Rejected" ) {
   return res.status(200).json({
     status: 'Success',
     message: 'Review updated successfully',
-    data: updateTourReview,
+    data: review,
   });
 });
 
