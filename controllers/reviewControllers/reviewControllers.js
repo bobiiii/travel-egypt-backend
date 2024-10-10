@@ -5,7 +5,14 @@ const { asyncHandler } = require('../../utils/asynhandler');
 const { ErrorHandler } = require('../../utils/errohandler');
 
 const getReviews = asyncHandler(async (req, res, next) => {
-  const reviews = await ReviewModel.find({status:"Approved"});
+const {tourId} = req.params
+  
+if (!tourId) {
+  return next(new ErrorHandler('Please provide tourId', 400));
+ 
+}
+const reviews = await ReviewModel.find({ status: "Approved", tourId });
+
 
   if (reviews.length === 0) {
     return next(new ErrorHandler('No approved reviews found', 404));
@@ -60,20 +67,6 @@ const addReview = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler('Tour not found', 404));
   } 
 
-
-  // let imageId;
-  // let reviewImages = [];
-
-  // for (const file of files) {
-
-  //   if (file.fieldname === 'images') {
-  //     reviewImages.push(uploadImageToS3(file));
-  //     // imageId =
-  //   } 
-  // }
-
-
- // const reviewImageId = await uploadImageToDrive(reviewImage);
   const review = await ReviewModel.create({
     tourId, tourName, firstName ,lastName ,phone ,email, rating , reviewText, 
   });
@@ -81,15 +74,8 @@ const addReview = asyncHandler(async (req, res, next) => {
   if (!review) {
     return next(new ErrorHandler('Unable To Add review', 500));
   }
-
-  // const updateTourReview = await TourModel.findByIdAndUpdate(
-  //   tourId,
-  //   { $push: { tourId: review._id } }, // Push the created tour's ID into the tourId array
-  //   { new: true } // Return the updated document
-  // );
-
-  // tour.reviewsId = [...tour.reviewsId, review._id];
-  // await tour.save();
+  tour.reviewsId = [...tour.reviewsId, review._id];
+  await tour.save();
 
   return res.status(200).json({
     status: 'Success',

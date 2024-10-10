@@ -10,13 +10,13 @@ const {
 const publicRoute = express.Router();
 
 publicRoute.get('/admin/login', userControllers.loginUserController);
-publicRoute.get('/get-tour/:slug', tourControllers.getTour);
+publicRoute.get('/get-tour/:tourId', tourControllers.getTour);
 publicRoute.get('/get-all-tours', tourControllers.getAllTours);
 publicRoute.get('/get-all-categories', categoryControllers.getAllCategories);
 publicRoute.get('/get-category/:slug', categoryControllers.getCategory);
 publicRoute.get('/get-all-subcategories', subCategoryControllers.getAllSubCategories);
 publicRoute.get('/get-subcategories/:slug', subCategoryControllers.getSubCategory);
-publicRoute.get('/get-reviews', reviewControllers.getReviews);
+publicRoute.get('/get-reviews/:tourId', reviewControllers.getReviews);
 publicRoute.post('/add-review', reviewControllers.addReview);
 // publicRoute.get('/get-reviews-status', reviewControllers.getReviewsByStatus);
 publicRoute.get('/get-besttours', bstControllers.getAllBestTours);
