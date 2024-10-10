@@ -8,7 +8,7 @@ const { uploadImageToS3, updateImageToS3, deleteObjectFromS3 } = require('../../
 
 const getTour = asyncHandler(async (req, res, next) => {
   const { slug } = req.params;
-  const tour = await TourModel.find({slug}).populate("reviews")
+  const tour = await TourModel.findOne({slug}).populate("reviews")
 
   if (!tour) {
     return next(new ErrorHandler('Tour Not Found', 404));
