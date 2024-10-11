@@ -39,7 +39,52 @@ const getAllSubCategories = asyncHandler(async (req, res, next) => {
 
 const getSubCategory = asyncHandler(async (req, res, next) => {
   const { slug } = req.params;
-  const SubCategory = await SubCategoryModel.findOne({slug}).populate('tourId').exec();
+  
+  
+  const SubCategory = await SubCategoryModel.aggregate([
+    { $match: { slug } },
+    {
+      $lookup: {
+        from: 'tours', 
+        localField: 'tourId',
+        foreignField: '_id',
+        as: 'tourId',
+      },
+    },
+    {
+      $unwind: '$tourId', 
+    },
+    {
+      $lookup: {
+        from: 'reviews', 
+        localField: 'tourId.reviewsId',
+        foreignField: '_id',
+        as: 'tourId.reviewsId',
+      },
+    },
+    {
+      $group: { 
+        _id: '$_id',
+        categoryId: { $first: '$categoryId' },
+        subCategoryName: { $first: '$subCategoryName' },
+        subCategoryImage: { $first: '$subCategoryImage' },
+        subCategoryTitle: { $first: '$subCategoryTitle' },
+        subCategoryText: { $first: '$subCategoryText' },
+        subCategoryHeroImage: { $first: '$subCategoryHeroImage' },
+        subCategoryMobHeroImage: { $first: '$subCategoryMobHeroImage' },
+        tourId: { $push: '$tourId',
+
+         },
+      },
+    },
+    {
+      $addFields: {
+        'tourId.reviewCount': { $size: '$tourId.reviewsId' },
+      },
+    },
+  ]);
+
+
 
   if (!SubCategory) {
     return next(new ErrorHandler('Subcategory Not Found', 404));

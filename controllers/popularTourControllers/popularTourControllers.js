@@ -4,7 +4,41 @@ const { ErrorHandler } = require("../../utils/errohandler");
 
 const getAllPopularTours = asyncHandler(async (req, res, next) => {
   
-  const popularTours = await PopularTourModel.find().populate('tourId');
+  const popularTours = await PopularTourModel.find({}).aggregate([
+    
+    {
+      $lookup: {
+        from: 'tours', 
+        localField: 'tourId',
+        foreignField: '_id',
+        as: 'tourId',
+      },
+    },
+    {
+      $unwind: '$tourId', 
+    },
+    {
+      $lookup: {
+        from: 'reviews', 
+        localField: 'tourId.reviewsId',
+        foreignField: '_id',
+        as: 'tourId.reviewsId',
+      },
+    },
+    {
+      $group: { 
+        _id: '$_id',
+        tourId: { $push: '$tourId' },
+
+
+      },
+    },
+    {
+      $addFields: {
+        'tourId.reviewCount': { $size: '$tourId.reviewsId' },
+      },
+    },
+  ]);
   if (!popularTours) {
     return next(new ErrorHandler('No Popular Tours Found', 404));
   }
