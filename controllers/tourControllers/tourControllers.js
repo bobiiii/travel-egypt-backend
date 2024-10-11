@@ -8,7 +8,7 @@ const { uploadImageToS3, updateImageToS3, deleteObjectFromS3 } = require('../../
 
 const getTour = asyncHandler(async (req, res, next) => {
   const { slug } = req.params;
-  const tour = await TourModel.findOne({slug}) .populate({
+  const tour = await TourModel.findOne({slug}).populate({
     path: 'reviewsId',
     model: 'Review', // assuming your review model is named 'Review'
     match: { status: 'Approved' }
@@ -28,26 +28,31 @@ const getTour = asyncHandler(async (req, res, next) => {
 });
 
 const getAllTours = asyncHandler(async (req, res, next) => {
-  const tours = await TourModel.aggregate([
-    {
-      $lookup: {
-        from: 'reviews',
-        localField: '_id',
-        foreignField: 'tourId',
-        as: 'reviews',
-      },
-    },
-    {
-      $addFields: {
-        reviewCount: { $size: '$reviews' },
-      },
-    },
-    {
-      $project: {
-        reviews: 0,
-      },
-    },
-  ]).exec();
+  // const tours = await TourModel.aggregate([
+    //   {
+      //     $lookup: {
+        //       from: 'reviews',
+        //       localField: '_id',
+        //       foreignField: 'tourId',
+        //       as: 'reviews',
+  //     },
+  //   },
+  //   {
+  //     $addFields: {
+  //       reviewCount: { $size: '$reviews' },
+  //     },
+  //   },
+  //   {
+  //     $project: {
+  //       reviews: 0,
+  //     },
+  //   },
+  // ]).exec();
+  const tours = await TourModel.find({}).populate({
+    path: 'reviewsId',
+    model: 'Review', // assuming your review model is named 'Review'
+    match: { status: 'Approved' }
+  })
 
   if (tours.length === 0) {
     return next(new ErrorHandler('No Tours Found', 404));
