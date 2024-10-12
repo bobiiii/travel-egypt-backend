@@ -20,8 +20,16 @@ const getSubscribers = asyncHandler(async(req,res,next)=>{
 const addSubscriber = asyncHandler(async(req,res,next)=>{
     const {email} = req.body
 
-if (!email) {
-    return next(new ErrorHandler("Please provide email", 400))
+    if (!email) {
+        return next(new ErrorHandler("Please provide email", 400))
+       
+    }
+    const subscriberExist = await  SubscribeModel.find({
+        email
+    })
+
+if (!subscriberExist) {
+    return next(new ErrorHandler("Already Exist! Please choose different E-Mail", 400))
    
 }
     const subscriber = await  SubscribeModel.create({
@@ -34,7 +42,7 @@ if (!email) {
 
     return res.status(200).json({
         status:"success",
-        message:"Subscriber added successfully",
+        message:"Thank you! We will get back to you soon!",
         data: subscriber
     })
 })
