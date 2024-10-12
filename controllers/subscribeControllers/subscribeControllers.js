@@ -28,7 +28,7 @@ const addSubscriber = asyncHandler(async(req,res,next)=>{
         email
     })
 
-if (!subscriberExist) {
+if (subscriberExist) {
     return next(new ErrorHandler("Already Exist! Please choose different E-Mail", 400))
    
 }
