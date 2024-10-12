@@ -11,6 +11,7 @@ const approvedReview = require('./approvedReviewRoute');
 const metadataRoute = require('./metadataRoutes');
 const messageRoute = require('./messageRoutes');
 const userRoute = require('./userRoutes');
+const subscribeRoute = require('./subscribeRoutes');
 
 const adminRoutes = express.Router();
 
@@ -27,6 +28,7 @@ adminRoutes.use('/approvedreview', approvedReview)
 adminRoutes.use('/metadata', metadataRoute)
 adminRoutes.use('/booking', bookingRoute)
 adminRoutes.use('/message', messageRoute)
+adminRoutes.use('/subscribe', subscribeRoute)
 
 adminRoutes.use('/*', (req, res) => {
   res.status(404).json({ message: 'Route Not Found' });

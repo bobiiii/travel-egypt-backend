@@ -5,11 +5,12 @@ const {
   messageControllers,
   metadataControllers,
   userControllers,
+  subscribeControllers,
 } = require('../../controllers');
 
 const publicRoute = express.Router();
 
-publicRoute.get('/admin/login', userControllers.loginUserController);
+publicRoute.post('/admin-login', userControllers.loginUserController);
 publicRoute.get('/get-tour/:slug', tourControllers.getTour);
 publicRoute.get('/get-all-tours', tourControllers.getAllTours);
 publicRoute.get('/get-all-categories', categoryControllers.getAllCategories);
@@ -26,6 +27,7 @@ publicRoute.get('/get-related-tours', relatedToursControllers.getAllRelatedTours
 publicRoute.post('/add-booking', bookingControllers.addBooking);
 publicRoute.post('/send-message', messageControllers.addMessage);
 publicRoute.get('/get-metadata/:entityId', metadataControllers.getMetadata);;
+publicRoute.post('/add-subscriber', subscribeControllers.addSubscriber);;
 
 // publicRoute.get('/get-all-bookings', relatedToursControllers.getAllRelatedTours);
 // publicRoute.get('/update-bookings', relatedToursControllers.getAllRelatedTours);

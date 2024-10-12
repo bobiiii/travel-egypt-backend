@@ -2,7 +2,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const signToken = async (id) => jwt.sign({ id }, process.env.SECRET_KEY);
+const signToken = async (id) => jwt.sign({ id }, process.env.SECRETKRY);
 
 const sendCookieToken = async (user, statusCode, req, res) => {
   const token = await signToken(user.id);

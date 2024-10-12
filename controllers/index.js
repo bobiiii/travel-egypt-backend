@@ -12,6 +12,7 @@ const   relatedToursControllers = require('./relatedToursControllers');
 const   metadataControllers = require('./metadataControllers');
 const   messageControllers = require('./messageControllers');
 const   userControllers = require('./userControllerss');
+const   subscribeControllers = require('./subscribeControllers');
 
 
 
@@ -30,4 +31,5 @@ module.exports = {
   metadataControllers,
   messageControllers,
   userControllers,
+  subscribeControllers,
 };

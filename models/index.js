@@ -1,6 +1,6 @@
 const {
   TourModel, CategoryModel, SubCategoryModel, ReviewModel, BookingModel, PopularTourModel, BestTourModel, DiscountedTourModel, ApprovedReviewModel, MessageModel,
-  UserModel,
+  UserModel, SubscribeModel
 } = require('./tour.model');
 
 module.exports = {
@@ -14,6 +14,7 @@ module.exports = {
   DiscountedTourModel,
   ApprovedReviewModel,
   MessageModel,
-  UserModel
+  UserModel,
+  SubscribeModel
 };
 // a

@@ -1,6 +1,6 @@
 // const { asyncHandler } = require('../../utils/asyncHandler');
 const { ErrorHandler } = require('../utils/errohandler');
-const { AdminModel } = require('../models');
+const { AdminModel, UserModel } = require('../models');
 const { asyncHandler } = require('../utils/asynhandler');
 const jwt = require('jsonwebtoken');
 const { environmentVariables } = require('../config');
@@ -24,15 +24,15 @@ const adminOnly = asyncHandler(async (req, res, next) => {
   const decoded = jwt.verify(token, environmentVariables.SECRET_KEY);
 
   // Find user by ID from the token
-  const admin = await AdminModel.findById(decoded.id);
+  const user = await UserModel.findById(decoded.id);
 
-  if (!admin || admin.userType !== 'Admin') {
-    return next(
-      new ErrorHandler('Access denied, only admins can access this route', 403)
-    );
-  }
+  // if (!admin || admin.userType !== 'Admin') {
+  //   return next(
+  //     new ErrorHandler('Access denied, only admins can access this route', 403)
+  //   );
+  // }
   // Attach admin to request object
-  req.admin = admin;
+  req.user = user;
   next();
 });
 

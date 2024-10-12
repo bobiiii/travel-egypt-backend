@@ -227,6 +227,11 @@ const userSchema = new mongoose.Schema({
 })
 
 
+const subscribeSchema = new mongoose.Schema({
+  email: { type: String , required: true, trim: true},
+  date: { type: Date, default: Date.now },
+})
+
 
 
 
@@ -243,8 +248,9 @@ const ApprovedReviewModel = mongoose.model('ApprovedReviews', approvedReviewSche
 const MetadataModel = mongoose.model('metadata', metadataSchema);
 const MessageModel = mongoose.model('messages', messageSchema);
 const UserModel = mongoose.model('user', userSchema);
+const SubscribeModel = mongoose.model('subscribe', subscribeSchema);
 
 
 module.exports = {
   TourModel, CategoryModel, SubCategoryModel, ReviewModel, BookingModel, PopularTourModel, BestTourModel, DiscountedTourModel, ApprovedReviewModel, BlogModel,
-MetadataModel, MessageModel, UserModel};
+MetadataModel, MessageModel, UserModel, SubscribeModel};
