@@ -1,5 +1,11 @@
-const {addBlog, getAllBlogs, getBlog, updateBlog, deleteBlog} = require('./blogControllers')
+const {    addBlogController, 
+    getAllBlogsController,
+    // getAllBlogs, getBlog, updateBlog, 
+    deleteBlogController} = require('./blogControllers')
 
 module.exports = {
-    addBlog, getAllBlogs, getBlog, updateBlog, deleteBlog
+    addBlogController, 
+    getAllBlogsController,
+    // getAllBlogs, getBlog, updateBlog, 
+    deleteBlogController
 }

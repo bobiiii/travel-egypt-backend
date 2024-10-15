@@ -11,6 +11,7 @@ const {
   globalErrorHandler,
   ErrorHandler,
 } = require('../utils/errohandler');
+const { adminOnly } = require('../middlewares');
 
 app.use(express.json({ limit: '5000mb' }));
 app.use(express.urlencoded({ limit: '5000mb', extended: true }));
@@ -34,7 +35,7 @@ app.use(startDB);
 
 app.get('/', (req, res) => res.status(200).json({ message: 'Working fine' }));
 app.use('/api', apiRoutes);
-app.use('/admin', adminRoutes);
+app.use('/admin', adminOnly , adminRoutes);
 app.use(globalErrorHandler);
 
 // handle invalid routes

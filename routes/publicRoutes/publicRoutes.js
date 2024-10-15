@@ -6,6 +6,7 @@ const {
   metadataControllers,
   userControllers,
   subscribeControllers,
+  blogControllers,
 } = require('../../controllers');
 
 const publicRoute = express.Router();
@@ -27,6 +28,7 @@ publicRoute.get('/get-related-tours', relatedToursControllers.getAllRelatedTours
 publicRoute.post('/add-booking', bookingControllers.addBooking);
 publicRoute.post('/send-message', messageControllers.addMessage);
 publicRoute.get('/get-metadata/:entityId', metadataControllers.getMetadata);;
+publicRoute.get('/get-blogs', blogControllers.getAllBlogsController);;
 publicRoute.post('/add-subscriber', subscribeControllers.addSubscriber);;
 
 // publicRoute.get('/get-all-bookings', relatedToursControllers.getAllRelatedTours);

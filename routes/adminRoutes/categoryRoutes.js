@@ -6,7 +6,7 @@ const { adminOnly } = require('../../middlewares/adminOnly');
 const upload = multer();
 const categoryRoute = express.Router();
 
-categoryRoute.post('/add-category', adminOnly ,upload.any(), categoryControllers.addCategory);
+categoryRoute.post('/add-category', upload.any(), categoryControllers.addCategory);
 categoryRoute.put('/update-category/:categoryId', upload.any(), categoryControllers.updateCategory);
 categoryRoute.delete('/delete-category/:categoryId', categoryControllers.deleteCategory);
 // categoryRoute.get('/get-all-tours', tourControllers.getAllTours);

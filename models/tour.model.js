@@ -154,9 +154,14 @@ const approvedReviewSchema = new mongoose.Schema({
 });
 
 const blogSchema = new mongoose.Schema({
-  title: { type: String },
-  cardImage: { type: String },
-  para: { type: String }
+
+  title : {type: String, trim: true},
+   image : {type: String, trim: true},
+   shortdesc : {type: String, trim: true},
+   desc : {type: String, trim: true},
+   category : {type: String, trim: true},
+    date : {type: String, trim: true},
+   content: {type: Object , },
 });
 
 const bookingSchema = new mongoose.Schema({

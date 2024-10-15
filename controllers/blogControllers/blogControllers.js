@@ -4,20 +4,26 @@ const {ErrorHandler} = require('../../utils/errohandler');
 
 
 
-const addBlog = asyncHandler(async (req, res, next) => {
-    const { files } = req;
-    let { title, para } = req.body;
-    const cardImage = files.find((item) => item.fieldname === 'cardImage');
+const addBlogController = asyncHandler(async (req, res, next) => {
+    // const { files } = req;
+    const { title = "test", image = "test", shortdesc = "test", desc = "test", category = "test",  date = "test", content, } = req.body;
+    console.log("constent", content);
+    // console.log("constent", content.content[0].content[0].marks);
+    // console.log("constent", JSON.parse(content));
+    
+    if (!title || !image || !shortdesc || !desc || !category ||  !date || !content) {
+      return next(new ErrorHandler("Please rpovide all fields.", 400))
+    }
+    
+    // const cardImage = files.find((item) => item.fieldname === 'cardImage');
   
     // if (!title || !para) {
-    //   return next(new ErrorHandler('please fill all fields', 400));
+    //   return next(new ErrorHandler('please fill all fields', 400)); 
     // }
   
-    const cardImageId = await uploadImageToDrive(cardImage);
+    // const cardImageId = await uploadImageToDrive(cardImage);
     const blog = await BlogModel.create({
-        title, 
-        cardImage: cardImageId,
-        para
+      title, image, shortdesc, desc , category,  date, content,
     });
   
     if (!blog) {
@@ -26,23 +32,21 @@ const addBlog = asyncHandler(async (req, res, next) => {
   
     return res.status(200).json({
       status: 'Success',
-      code: 200,
-      message: 'Add Blog Successfully',
+      message: 'Blog added successfully',
       data: blog,
     });
   });
 
-  const getAllBlogs = asyncHandler(async (req, res, next) => {
+  const getAllBlogsController = asyncHandler(async (req, res, next) => {
     const blogs = await BlogModel.find({});
   
-    if (blogs.length === 0) {
+    if (!blogs.length ) {
       return next(new ErrorHandler('no Blogs found'), 404);
     }
   
     return res.status(200).json(
       {
         status: 'Success',
-        code: 200,
         message: 'Request Successfull',
         data: blogs,
       },
@@ -103,7 +107,7 @@ const addBlog = asyncHandler(async (req, res, next) => {
     });
   });
 
-  const deleteBlog = asyncHandler(async (req, res, next) => {
+  const deleteBlogController = asyncHandler(async (req, res, next) => {
     const { blogId } = req.params;
   
     const deleteBlog =  await SubCategoryModel.findByIdAndDelete(blogId).exec();
@@ -121,9 +125,8 @@ const addBlog = asyncHandler(async (req, res, next) => {
   });
 
   module.exports = {
-    addBlog,
-    getAllBlogs,
-    getBlog,
-    deleteBlog,
-    updateBlog,
-  }
+    addBlogController, 
+    getAllBlogsController,
+    // getAllBlogs, getBlog, updateBlog, 
+    deleteBlogController
+}
