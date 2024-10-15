@@ -21,7 +21,7 @@ const adminOnly = asyncHandler(async (req, res, next) => {
   }
 
   // Verify token
-  const decoded = jwt.verify(token, environmentVariables.SECRET_KEY);
+  const decoded = jwt.verify(token, process.env.SECRETKRY);
 
   // Find user by ID from the token
   const user = await UserModel.findById(decoded.id);
