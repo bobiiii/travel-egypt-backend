@@ -1,20 +1,21 @@
 const {BlogModel} = require('../../models');
 const {asyncHandler} = require('../../utils/asynhandler');
+const { createSlug } = require('../../utils/createSlug');
 const {ErrorHandler} = require('../../utils/errohandler');
 
 
 
 const addBlogController = asyncHandler(async (req, res, next) => {
-    // const { files } = req;
-    const { title = "test", image = "test", shortdesc = "test", desc = "test", category = "test",  date = "test", content, } = req.body;
-    console.log("constent", content);
-    // console.log("constent", content.content[0].content[0].marks);
-    // console.log("constent", JSON.parse(content));
+    const { title , image = "test" , shortdesc  , category ,  date , content, } = req.body;
     
-    if (!title || !image || !shortdesc || !desc || !category ||  !date || !content) {
+    if (!title || !image  || !shortdesc || !category ||  !date || !content) {
       return next(new ErrorHandler("Please rpovide all fields.", 400))
     }
-    
+    const blogExist = await BlogModel.find(title)
+    if (blogExist) {
+      return next(new ErrorHandler("Blog already exists", 400))
+    }
+    const slug = createSlug(title)
     // const cardImage = files.find((item) => item.fieldname === 'cardImage');
   
     // if (!title || !para) {
@@ -23,7 +24,7 @@ const addBlogController = asyncHandler(async (req, res, next) => {
   
     // const cardImageId = await uploadImageToDrive(cardImage);
     const blog = await BlogModel.create({
-      title, image, shortdesc, desc , category,  date, content,
+      title, slug, image, shortdesc , category,  date, content,
     });
   
     if (!blog) {

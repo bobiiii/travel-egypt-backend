@@ -156,9 +156,9 @@ const approvedReviewSchema = new mongoose.Schema({
 const blogSchema = new mongoose.Schema({
 
   title : {type: String, trim: true},
+  slug:{type: String, trim: true},
    image : {type: String, trim: true},
    shortdesc : {type: String, trim: true},
-   desc : {type: String, trim: true},
    category : {type: String, trim: true},
     date : {type: String, trim: true},
    content: {type: Object , },

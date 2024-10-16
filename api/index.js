@@ -35,7 +35,7 @@ app.use(startDB);
 
 app.get('/', (req, res) => res.status(200).json({ message: 'Working fine' }));
 app.use('/api', apiRoutes);
-app.use('/admin', adminOnly , adminRoutes);
+app.use('/admin', adminOnly, adminRoutes);
 app.use(globalErrorHandler);
 
 // handle invalid routes
