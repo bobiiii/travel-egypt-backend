@@ -157,7 +157,8 @@ const blogSchema = new mongoose.Schema({
 
   title : {type: String, trim: true},
   slug:{type: String, trim: true},
-   image : {type: String, trim: true},
+  cardImageId : {type: String, trim: true},
+  mainImageId: {type: String, trim: true},
    shortdesc : {type: String, trim: true},
    category : {type: String, trim: true},
     date : {type: String, trim: true},

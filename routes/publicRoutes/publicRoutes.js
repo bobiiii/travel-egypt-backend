@@ -29,6 +29,7 @@ publicRoute.post('/add-booking', bookingControllers.addBooking);
 publicRoute.post('/send-message', messageControllers.addMessage);
 publicRoute.get('/get-metadata/:entityId', metadataControllers.getMetadata);;
 publicRoute.get('/get-blogs', blogControllers.getAllBlogsController);;
+publicRoute.get('/get-single-blog/:slug', blogControllers.getSingleBlogController);;
 publicRoute.post('/add-subscriber', subscribeControllers.addSubscriber);;
 
 // publicRoute.get('/get-all-bookings', relatedToursControllers.getAllRelatedTours);

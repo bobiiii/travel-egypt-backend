@@ -6,25 +6,30 @@ const {ErrorHandler} = require('../../utils/errohandler');
 
 
 const addBlogController = asyncHandler(async (req, res, next) => {
-    const { title , image = "test" , shortdesc  , category ,  date , content, } = req.body;
+  const {files} = req.files
+  
+  const { title  , shortdesc  , category ,  date , content, } = req.body;
+  const cardImage = files.find((item) => item.fieldname === 'cardImage');
+  const mainImage = files.find((item) => item.fieldname === 'mainImage');
     
-    if (!title || !image  || !shortdesc || !category ||  !date || !content) {
+    if (!title || !cardImage || !mainImage  || !shortdesc || !category ||  !date || !content) {
       return next(new ErrorHandler("Please rpovide all fields.", 400))
     }
-    const blogExist = await BlogModel.find(title)
+    const blogExist = await BlogModel.find({title})
     if (blogExist) {
       return next(new ErrorHandler("Blog already exists", 400))
     }
     const slug = createSlug(title)
-    // const cardImage = files.find((item) => item.fieldname === 'cardImage');
   
-    // if (!title || !para) {
-    //   return next(new ErrorHandler('please fill all fields', 400)); 
-    // }
+    const cardImageId = await uploadImageToS3(cardImage);
+    const mainImageId = await uploadImageToS3(mainImage);
+    if (!cardImageId || !mainImageId) {
+      return next(new ErrorHandler('unable to process images', 400)); 
+    }
   
     // const cardImageId = await uploadImageToDrive(cardImage);
     const blog = await BlogModel.create({
-      title, slug, image, shortdesc , category,  date, content,
+      title, slug, cardImageId, mainImageId, shortdesc , category,  date, content,
     });
   
     if (!blog) {
@@ -37,6 +42,26 @@ const addBlogController = asyncHandler(async (req, res, next) => {
       data: blog,
     });
   });
+
+  
+
+  const getSingleBlogController = asyncHandler(async (req, res, next) => {
+    const {slug} = req.params
+    const blog = await BlogModel.findOne({slug});
+  
+    if (!blogs) {
+      return next(new ErrorHandler('no Blog found'), 404);
+    }
+  
+    return res.status(200).json(
+      {
+        status: 'Success',
+        message: 'Request Successfull',
+        data: blog,
+      },
+    );
+  });
+
 
   const getAllBlogsController = asyncHandler(async (req, res, next) => {
     const blogs = await BlogModel.find({});
@@ -128,6 +153,7 @@ const addBlogController = asyncHandler(async (req, res, next) => {
   module.exports = {
     addBlogController, 
     getAllBlogsController,
+    getSingleBlogController,
     // getAllBlogs, getBlog, updateBlog, 
     deleteBlogController
 }

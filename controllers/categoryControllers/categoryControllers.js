@@ -76,8 +76,6 @@ const addCategory = asyncHandler(async (req, res, next) => {
   const categoryImageId = await uploadImageToS3(categoryImage);
 const categoryMobileImageId = await uploadImageToS3(categoryMobileImage);
 
-console.log(categoryImageId);
-console.log(categoryMobileImageId);
 
   const category = await CategoryModel.create({
     categoryName,
