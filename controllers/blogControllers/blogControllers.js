@@ -1,3 +1,4 @@
+const { uploadImageToS3 } = require('../../middlewares/awsS3');
 const {BlogModel} = require('../../models');
 const {asyncHandler} = require('../../utils/asynhandler');
 const { createSlug } = require('../../utils/createSlug');
@@ -6,19 +7,26 @@ const {ErrorHandler} = require('../../utils/errohandler');
 
 
 const addBlogController = asyncHandler(async (req, res, next) => {
-  const {files} = req.files
+  const {files} = req
   
   const { title  , shortdesc  , category ,  date , content, } = req.body;
   const cardImage = files.find((item) => item.fieldname === 'cardImage');
   const mainImage = files.find((item) => item.fieldname === 'mainImage');
     
+  // console.log(JSON.stringify(content, null, 2));
+// console.log(content);
+
+
     if (!title || !cardImage || !mainImage  || !shortdesc || !category ||  !date || !content) {
       return next(new ErrorHandler("Please rpovide all fields.", 400))
     }
-    const blogExist = await BlogModel.find({title})
-    if (blogExist) {
-      return next(new ErrorHandler("Blog already exists", 400))
-    }
+    // const blogExist = await BlogModel.find({title})
+    // if (blogExist) {
+    //   return next(new ErrorHandler("Blog already exists", 400))
+    // }
+    let parsedContent = JSON.parse(content); 
+    console.log(parsedContent);
+    
     const slug = createSlug(title)
   
     const cardImageId = await uploadImageToS3(cardImage);
@@ -29,7 +37,7 @@ const addBlogController = asyncHandler(async (req, res, next) => {
   
     // const cardImageId = await uploadImageToDrive(cardImage);
     const blog = await BlogModel.create({
-      title, slug, cardImageId, mainImageId, shortdesc , category,  date, content,
+      title, slug, cardImageId, mainImageId, shortdesc , category,  date, content : parsedContent,
     });
   
     if (!blog) {
@@ -49,7 +57,7 @@ const addBlogController = asyncHandler(async (req, res, next) => {
     const {slug} = req.params
     const blog = await BlogModel.findOne({slug});
   
-    if (!blogs) {
+    if (!blog) {
       return next(new ErrorHandler('no Blog found'), 404);
     }
   
