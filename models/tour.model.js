@@ -202,7 +202,7 @@ const bookingSchema = new mongoose.Schema({
 const metadataSchema = new mongoose.Schema({
   entityId: { type: mongoose.Schema.Types.ObjectId, required: true, unique: true }, // Unique ID for each entity
   entityType : { type: String, 
-    enum:["category", "subcategory", "tour"],
+    enum:["category", "subcategory", "tour", "blog"],
     required: true
    }, 
   title: { type: String, trim: true },
