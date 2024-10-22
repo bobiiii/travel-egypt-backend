@@ -1,4 +1,4 @@
-const { uploadImageToS3 } = require('../../middlewares/awsS3');
+const { uploadImageToS3, deleteImageFromS3, updateImageToS3 } = require('../../middlewares/awsS3');
 const {BlogModel} = require('../../models');
 const {asyncHandler} = require('../../utils/asynhandler');
 const { createSlug } = require('../../utils/createSlug');
@@ -107,53 +107,63 @@ const addBlogController = asyncHandler(async (req, res, next) => {
     );
   });
 
-  const updateBlog = asyncHandler(async (req, res, next) => {
+  const updateBlogController = asyncHandler(async (req, res, next) => {
     const { blogId } = req.params;
-    const { title, para } = req.body;
+    const { title  , shortdesc  , category ,  date , content, } = req.body;
     const { files } = req;
   
-    let Blog = await BlogModel.findById(blogId);
+    let blog = await BlogModel.findById(blogId);
   
-    if (!Blog) {
+    if (!blog) {
       return next(new ErrorHandler('Blog Not Found', 404));
     }
   
   
     if (files && files.length !== 0) {
-      const fileId = Blog.cardImage;
+      const fileId = blog.cardImageId;
+      const fileId2 = blog.mainImageId;
       const updateImage = files.find((item) => item.fieldname === "cardImage");
       if (updateImage) {
-        let updateImageId = await updateImageOnDrive(fileId, updateImage);
-        Blog.cardImage = updateImageId;
+        let updateImageId = await updateImageToS3(updateImage, fileId );
+        blog.cardImageId = updateImageId;
       }
+      const updateImage2 = files.find((item) => item.fieldname === "mainImage");
+      if (updateImage2) {
+        let updateImageId = await updateImageToS3( updateImage2, fileId2);
+        blog.mainImageId = updateImageId;
+      }
+
     }
   
-    Blog.title = title || Blog.title;
-    Blog.para = para || Blog.para;
+    blog.title = title || blog.title;
+    blog.shortdesc = shortdesc || blog.shortdesc;
+    blog.category = category || blog.category;
+    blog.date = date || blog.date;
+    blog.content = JSON.parse(content)  || blog.content;
   
-    await Blog.save();
+    await blog.save();
   
     return res.status(200).json({
       status: 'Success',
-      code: 200,
+      // code: 200,
       message: 'Blog updated successfully',
-      data: Blog,
+      data: blog,
     });
   });
 
   const deleteBlogController = asyncHandler(async (req, res, next) => {
     const { blogId } = req.params;
   
-    const deleteBlog =  await SubCategoryModel.findByIdAndDelete(blogId).exec();
+    const deleteBlog =  await BlogModel.findByIdAndDelete(blogId).exec();
   
     if (!deleteBlog) {
       return next(new ErrorHandler('Blog Not Found', 404));
     }
   
-    await deleteImage(deleteBlog.cardImage);
+    await deleteImageFromS3(deleteBlog.cardImage);
     return res.status(200).json({
       status: 'Success',
-      code: 200,
+      
       message: 'Delete Blog SuccessFully',
     });
   });
@@ -162,6 +172,7 @@ const addBlogController = asyncHandler(async (req, res, next) => {
     addBlogController, 
     getAllBlogsController,
     getSingleBlogController,
+    updateBlogController,
     // getAllBlogs, getBlog, updateBlog, 
     deleteBlogController
 }

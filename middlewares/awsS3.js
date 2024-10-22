@@ -76,7 +76,7 @@ const updateImageToS3 = async (image, existingImageKey) => {
 };
 
 
-  const deleteObjectFromS3 = async (imageKey) => {
+  const deleteImageFromS3 = async (imageKey) => {
     const deleteParams = {
       Bucket: process.env.AWS_BUCKET_NAME,
       Key: imageKey,
@@ -96,5 +96,5 @@ const updateImageToS3 = async (image, existingImageKey) => {
 module.exports = {
     uploadImageToS3   ,
     updateImageToS3,
-    deleteObjectFromS3
+    deleteImageFromS3
 }
