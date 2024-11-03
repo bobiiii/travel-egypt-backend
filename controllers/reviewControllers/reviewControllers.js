@@ -1,5 +1,3 @@
-const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
-const { uploadImageToS3 } = require('../../middlewares/awsS3');
 const { ReviewModel, TourModel } = require('../../models');
 const { asyncHandler } = require('../../utils/asynhandler');
 const { ErrorHandler } = require('../../utils/errohandler');

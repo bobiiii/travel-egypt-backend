@@ -1,10 +1,11 @@
 const { CategoryModel, SubCategoryModel, TourModel } = require('../../models');
 const { asyncHandler } = require('../../utils/asynhandler');
 const { ErrorHandler } = require('../../utils/errohandler');
-const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
+// const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
 const { responseHandler } = require('../../utils/response');
 const { createSlug } = require('../../utils/createSlug');
-const { uploadImageToS3, updateImageToS3, deleteObjectFromS3 } = require('../../middlewares/awsS3');
+// const {  updateImageToS3, deleteObjectFromS3, deleteImageFromS3 } = require('../../middlewares/awsS3');
+const { uploadImage, updateImageLocal, deleteImage } = require('../../middlewares/imageHandlers');
 
 // req access
 
@@ -61,20 +62,16 @@ const addCategory = asyncHandler(async (req, res, next) => {
   const categoryImage = files.find((item) => item.fieldname === 'categoryImage');
   const categoryMobileImage = files.find((item) => item.fieldname === 'categoryMobImage');
 
+
+
   if (!categoryName || !categoryImage || !categoryMobileImage) {
     return next(new ErrorHandler('please fill all fields', 400));
   }
 
-  // const slugify = (categoryName) => categoryName.toLowerCase().replace(/\s+/g, '-');
   const sulgAuto = createSlug(categoryName);
-  // createSlug
+  const categoryImageId = await uploadImage(categoryImage, "category");
+  const categoryMobileImageId = await uploadImage(categoryMobileImage, "category");
 
-  // const categoryImageId = await uploadImageToDrive(categoryImage);
-  // const categoryMobileImageId = await uploadImageToDrive(categoryMobileImage);
-
-
-  const categoryImageId = await uploadImageToS3(categoryImage);
-const categoryMobileImageId = await uploadImageToS3(categoryMobileImage);
 
 
   const category = await CategoryModel.create({
@@ -127,12 +124,12 @@ const updateCategory = asyncHandler(async (req, res, next) => {
     const categoryMobImage = files.find((item) => item.fieldname === "categoryMobImage");
     
     if (updateImage) {
-      let updateImageId = await updateImageToS3( updateImage,category.categoryImage);
+      let updateImageId = await updateImageLocal( updateImage, category.categoryImage, "category");
       category.categoryImage = updateImageId;
     }
     
     if (categoryMobImage){
-      let categoryMobImageId = await updateImageToS3( categoryMobImage, category.categoryMobImage);
+      let categoryMobImageId = await updateImageLocal( categoryMobImage, category.categoryMobImage, "category");
       category.categoryMobImage = categoryMobImageId;
     }
   }
@@ -176,8 +173,8 @@ const deleteCategory = asyncHandler(async (req, res, next) => {
 
   // Delete category image if it exists
   if (category.categoryImage) {
-    await deleteObjectFromS3(category.categoryImage);
-    await deleteObjectFromS3(category.categoryMobImage);
+    await deleteImage(category.categoryImage, "category");
+    await deleteImage(category.categoryMobImage, "category");
   }
 
   // Use the subCategoryId array from the category to delete associated tours

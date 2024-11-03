@@ -45,4 +45,18 @@ const startDB = async (req, res, next) => {
   }
 };
 
-module.exports = { startDB };
+const startDBProduction = async () => {
+  if (process.env.NODE_ENV === 'production') {
+    try {
+      const connect = await mongoose.connect(process.env.MONGODB_URI,);
+      console.log('Database connected successfully:', connect.connection.host);
+    } catch (error) {
+      console.error('Database connection error:', error.message);
+      // Optionally handle the error further (e.g., exit process)
+      process.exit(1); // Exit the application if DB connection fails
+    }
+  } else {
+    console.log('Not in production mode, skipping DB connection.');
+  }
+};
+module.exports = { startDB, startDBProduction };

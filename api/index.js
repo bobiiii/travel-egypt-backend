@@ -1,8 +1,8 @@
 const express = require('express');
-
+const path = require('path');
 const app = express();
 const cors = require('cors');
-const { startDB } = require('../config/dbConnect');
+const { startDB, startDBProduction } = require('../config/dbConnect');
 const { environmentVariables } = require('../config');
 const apiRoutes = require('../routes');
 const adminRoutes = require('../routes/adminRoutes');
@@ -20,7 +20,8 @@ app.use(
     origin: [
       'http://localhost:3000',
       'https://egypt-travel-frontend.vercel.app',
-      'http://127.0.0.1:5500/index.html'
+      // 'http://127.0.0.1:5500/index.html',
+      "https://vps-650845.dogado-cloud.de"
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
@@ -31,11 +32,18 @@ app.use(
 
 // app.options('*', cors());
 app.use(cors())
-app.use(startDB);
+if (process.env.NODE_ENV === 'development') {
+  app.use(startDB);
+  }
 
 app.get('/', (req, res) => res.status(200).json({ message: 'Working fine' }));
 app.use('/api', apiRoutes);
 app.use('/admin', adminOnly, adminRoutes);
+app.use('/images', express.static(path.resolve(__dirname, '../public/images')));
+
+// app.use(express.static(path.resolve(__dirname, '../public')));
+
+
 app.use(globalErrorHandler);
 
 // handle invalid routes
@@ -43,8 +51,9 @@ app.all('*', (req, res, next) => {
   next(new ErrorHandler(`URL ${req.originalUrl} not found on the server`, 404));
 });
 
-if (environmentVariables.NODE_ENV === 'development') {
+if (environmentVariables.NODE_ENV === 'production') {
   app.listen(environmentVariables.PORT, () => {
+  startDBProduction()
     console.log(
       `server is running on localhost:${environmentVariables.PORT}`,
     );

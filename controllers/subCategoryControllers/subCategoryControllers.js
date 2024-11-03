@@ -1,5 +1,5 @@
-const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
-const { uploadImageToS3, updateImageToS3, deleteObjectFromS3 } = require('../../middlewares/awsS3');
+const { updateImageToS3, deleteObjectFromS3 } = require('../../middlewares/awsS3');
+const { uploadImage, deleteImage, updateImageLocal } = require('../../middlewares/imageHandlers');
 const { SubCategoryModel, CategoryModel } = require('../../models');
 const { asyncHandler } = require('../../utils/asynhandler');
 const { createSlug } = require('../../utils/createSlug');
@@ -125,9 +125,9 @@ const addSubCategory = asyncHandler(async (req, res, next) => {
   // const slugify = (subCategoryName) => subCategoryName.toLowerCase().replace(/\s+/g, '-');
   const sulgAuto = createSlug(subCategoryName);
 
-  const subCategoryImageId = await uploadImageToS3(subCategoryImage);
-  const subCategoryHeroImageId = await uploadImageToS3(subCategoryHeroImage);
-  const subCategoryMobHeroImageId = await uploadImageToS3(subCategoryMobHeroImage);
+  const subCategoryImageId = await uploadImage(subCategoryImage, "subCategory");
+  const subCategoryHeroImageId = await uploadImage(subCategoryHeroImage, "subCategory");
+  const subCategoryMobHeroImageId = await uploadImage(subCategoryMobHeroImage, "subCategory");
 
 
   const subCategory = await SubCategoryModel.create({
@@ -217,15 +217,15 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
     const updateMobHeroImage = files.find((item)=>item.fieldname === 'subCategoryMobHeroImage')
 
     if(updateImage){
-      let updateImageId = await updateImageToS3(updateImage, subCategory.subCategoryImage, )
+      let updateImageId = await updateImageLocal(updateImage, subCategory.subCategoryImage, "subcategory" )
       subCategory.subCategoryImage = updateImageId;
     }
     if(updateHeroImage){
-      let updateHeroImageId = await updateImageToS3(updateHeroImage, subCategory.subCategoryHeroImage, )
+      let updateHeroImageId = await updateImageLocal(updateHeroImage, subCategory.subCategoryHeroImage, "subcategory")
       subCategory.subCategoryHeroImage = updateHeroImageId;
     } 
        if(updateMobHeroImage){
-      let updateMobHeroImageId = await updateImageToS3(updateMobHeroImage, subCategory.subCategoryMobHeroImage, )
+      let updateMobHeroImageId = await updateImageLocal(updateMobHeroImage, subCategory.subCategoryMobHeroImage, "subcategory")
       subCategory.subCategoryMobHeroImage = updateMobHeroImageId;
     }
   }
@@ -266,7 +266,7 @@ const deleteSubCategory = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler('Subcategory Doesn\'t Exist', 404));
   }
 
-  await deleteObjectFromS3(subCategory.subCategoryImage);
+  await deleteImage(subCategory.subCategoryImage);
 
   await CategoryModel.findByIdAndUpdate(subCategory.categoryId, {
     $pull: { subcategoryId: subCategory._id },

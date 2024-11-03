@@ -1,4 +1,5 @@
-const { uploadImageToS3, updateImageToS3 } = require("../../middlewares/awsS3");
+const {  updateImageToS3 } = require("../../middlewares/awsS3");
+const { uploadImage, updateImageLocal } = require("../../middlewares/imageHandlers");
 const { MetadataModel } = require("../../models/tour.model");
 const { asyncHandler } = require("../../utils/asynhandler");
 const { ErrorHandler } = require("../../utils/errohandler");
@@ -76,7 +77,7 @@ const addMetadata = asyncHandler(async (req, res, next) => {
 
     
     if (openGraphImage) {
-        uploadtoS3 = await uploadImageToS3(openGraphImage);
+        uploadtoS3 = await uploadImage(openGraphImage, "metadata");
         
     }else{
         return next(new ErrorHandler('Please provide ogImage! ', 400));
@@ -133,7 +134,7 @@ const updateMetadata = asyncHandler(async(req, res, next) => {
     const openGraphImage = files.find((item) => item.fieldname === 'ogImage');
     
     if (openGraphImage) {
-        metadata.ogImageId = await updateImageToS3(openGraphImage, metadata.ogImageId );
+        metadata.ogImageId = await updateImageLocal(openGraphImage, metadata.ogImageId, "metadata" );
         
     }
 

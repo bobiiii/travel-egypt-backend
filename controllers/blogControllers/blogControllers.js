@@ -1,4 +1,5 @@
-const { uploadImageToS3, deleteImageFromS3, updateImageToS3 } = require('../../middlewares/awsS3');
+const {  deleteImageFromS3, updateImageToS3 } = require('../../middlewares/awsS3');
+const { uploadImage, deleteImage } = require('../../middlewares/imageHandlers');
 const {BlogModel} = require('../../models');
 const {asyncHandler} = require('../../utils/asynhandler');
 const { createSlug } = require('../../utils/createSlug');
@@ -25,17 +26,16 @@ const addBlogController = asyncHandler(async (req, res, next) => {
     //   return next(new ErrorHandler("Blog already exists", 400))
     // }
     let parsedContent = JSON.parse(content); 
-    console.log(parsedContent);
+    
     
     const slug = createSlug(title)
   
-    const cardImageId = await uploadImageToS3(cardImage);
-    const mainImageId = await uploadImageToS3(mainImage);
+    const cardImageId = await uploadImage(cardImage, "blogs");
+    const mainImageId = await uploadImage(mainImage, "blogs");
     if (!cardImageId || !mainImageId) {
       return next(new ErrorHandler('unable to process images', 400)); 
     }
   
-    // const cardImageId = await uploadImageToDrive(cardImage);
     const blog = await BlogModel.create({
       title, slug, cardImageId, mainImageId, shortdesc , category,  date, content : parsedContent,
     });
@@ -124,12 +124,12 @@ const addBlogController = asyncHandler(async (req, res, next) => {
       const fileId2 = blog.mainImageId;
       const updateImage = files.find((item) => item.fieldname === "cardImage");
       if (updateImage) {
-        let updateImageId = await updateImageToS3(updateImage, fileId );
+        let updateImageId = await updateImageLocal(updateImage, fileId, "blogs" );
         blog.cardImageId = updateImageId;
       }
       const updateImage2 = files.find((item) => item.fieldname === "mainImage");
       if (updateImage2) {
-        let updateImageId = await updateImageToS3( updateImage2, fileId2);
+        let updateImageId = await updateImageLocal( updateImage2, fileId2, "blogs");
         blog.mainImageId = updateImageId;
       }
 
@@ -160,7 +160,7 @@ const addBlogController = asyncHandler(async (req, res, next) => {
       return next(new ErrorHandler('Blog Not Found', 404));
     }
   
-    await deleteImageFromS3(deleteBlog.cardImage);
+    await deleteImage(deleteBlog.cardImage, "blogs");
     return res.status(200).json({
       status: 'Success',
       

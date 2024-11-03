@@ -1,9 +1,9 @@
 const { TourModel, PopularTourModel, BestTourModel, DiscountedTourModel, SubCategoryModel } = require('../../models');
 const { asyncHandler } = require('../../utils/asynhandler');
 const { ErrorHandler } = require('../../utils/errohandler');
-const { uploadImageToDrive, deleteImage, updateImageOnDrive } = require('../../middlewares');
 const { createSlug } = require('../../utils/createSlug');
-const { uploadImageToS3, updateImageToS3, deleteObjectFromS3 } = require('../../middlewares/awsS3');
+const { updateImageToS3, deleteObjectFromS3 } = require('../../middlewares/awsS3');
+const { uploadImage, deleteImage } = require('../../middlewares/imageHandlers');
 
 
 const getTour = asyncHandler(async (req, res, next) => {
@@ -28,26 +28,7 @@ const getTour = asyncHandler(async (req, res, next) => {
 });
 
 const getAllTours = asyncHandler(async (req, res, next) => {
-  // const tours = await TourModel.aggregate([
-    //   {
-      //     $lookup: {
-        //       from: 'reviews',
-        //       localField: '_id',
-        //       foreignField: 'tourId',
-        //       as: 'reviews',
-  //     },
-  //   },
-  //   {
-  //     $addFields: {
-  //       reviewCount: { $size: '$reviews' },
-  //     },
-  //   },
-  //   {
-  //     $project: {
-  //       reviews: 0,
-  //     },
-  //   },
-  // ]).exec();
+  
   const tours = await TourModel.find({}).populate({
     path: 'reviewsId',
     model: 'Review', // assuming your review model is named 'Review'
@@ -101,10 +82,10 @@ let cardImageId;
   for (const file of files) {
 
     if (file.fieldname === 'cardImage') {
-      cardImageId = uploadImageToS3(file);
+      cardImageId = uploadImage(file, "tour");
 
     } else if (file.fieldname === 'tourImages') {
-      tourImagesPromises.push(uploadImageToS3(file));
+      tourImagesPromises.push(uploadImage(file, "tour"));
     }
   }
 
@@ -290,7 +271,7 @@ const updateTour = asyncHandler(async (req, res, next) => {
       } else if (file.fieldname === 'tourImage') {
         await updateImageToS3( file, tourImageId);
       }else if (file.fieldname === 'newtourImages') {
-         const newImageId = await uploadImageToS3( file);
+         const newImageId = await uploadImage( file, "tour");
          tour.tourImages.push(newImageId)
       }
     }
@@ -328,7 +309,7 @@ const deleteTour = asyncHandler(async (req, res, next) => {
   try {
     await Promise.all(tourAllImages.map(imageId => {
 
-      deleteObjectFromS3(imageId)
+      deleteImage(imageId)
 
     }));
   } catch (error) {
