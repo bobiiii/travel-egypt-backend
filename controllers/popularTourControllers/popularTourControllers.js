@@ -4,7 +4,7 @@ const { ErrorHandler } = require("../../utils/errohandler");
 
 const getAllPopularTours = asyncHandler(async (req, res, next) => {
   
-  const popularTours = await PopularTourModel.find({}).aggregate([
+  const popularTours = await PopularTourModel.aggregate([
     
     {
       $lookup: {

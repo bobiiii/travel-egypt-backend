@@ -28,7 +28,41 @@ const addDiscountedTourController = asyncHandler(async (req, res, next) => {
 
 const getAllDiscountTours = asyncHandler(async (req, res, next) => {
 
-  const discountedTours = await DiscountedTourModel.find().populate('tourId');
+  const discountedTours = await DiscountedTourModel.aggregate([
+    
+    {
+      $lookup: {
+        from: 'tours', 
+        localField: 'tourId',
+        foreignField: '_id',
+        as: 'tourId',
+      },
+    },
+    {
+      $unwind: '$tourId', 
+    },
+    {
+      $lookup: {
+        from: 'reviews', 
+        localField: 'tourId.reviewsId',
+        foreignField: '_id',
+        as: 'tourId.reviewsId',
+      },
+    },
+    {
+      $group: { 
+        _id: '$_id',
+        tourId: { $push: '$tourId' },
+
+
+      },
+    },
+    {
+      $addFields: {
+        'tourId.reviewCount': { $size: '$tourId.reviewsId' },
+      },
+    },
+  ]);
 
 
   if (discountedTours.length === 0) {
