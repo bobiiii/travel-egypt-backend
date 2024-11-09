@@ -217,15 +217,15 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
     const updateMobHeroImage = files.find((item)=>item.fieldname === 'subCategoryMobHeroImage')
 
     if(updateImage){
-      let updateImageId = await updateImageLocal(updateImage, subCategory.subCategoryImage, "subcategory" )
+      let updateImageId = await updateImageLocal(updateImage, subCategory.subCategoryImage, "subCategory" )
       subCategory.subCategoryImage = updateImageId;
     }
     if(updateHeroImage){
-      let updateHeroImageId = await updateImageLocal(updateHeroImage, subCategory.subCategoryHeroImage, "subcategory")
+      let updateHeroImageId = await updateImageLocal(updateHeroImage, subCategory.subCategoryHeroImage, "subCategory")
       subCategory.subCategoryHeroImage = updateHeroImageId;
     } 
        if(updateMobHeroImage){
-      let updateMobHeroImageId = await updateImageLocal(updateMobHeroImage, subCategory.subCategoryMobHeroImage, "subcategory")
+      let updateMobHeroImageId = await updateImageLocal(updateMobHeroImage, subCategory.subCategoryMobHeroImage, "subCategory")
       subCategory.subCategoryMobHeroImage = updateMobHeroImageId;
     }
   }
