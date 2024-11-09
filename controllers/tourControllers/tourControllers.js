@@ -309,7 +309,7 @@ const deleteTour = asyncHandler(async (req, res, next) => {
   try {
     await Promise.all(tourAllImages.map(imageId => {
 
-      deleteImage(imageId)
+      deleteImage(imageId, "tour")
 
     }));
   } catch (error) {

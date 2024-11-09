@@ -266,7 +266,7 @@ const deleteSubCategory = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler('Subcategory Doesn\'t Exist', 404));
   }
 
-  await deleteImage(subCategory.subCategoryImage);
+  await deleteImage(subCategory.subCategoryImage, "subCategory");
 
   await CategoryModel.findByIdAndUpdate(subCategory.categoryId, {
     $pull: { subcategoryId: subCategory._id },
