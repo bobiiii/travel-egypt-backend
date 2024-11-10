@@ -104,7 +104,7 @@ const updateImageOnDrive = async (fileId, updatedImage) => {
         name: updatedImage.originalname,
       },
     });
-    // console.log(data)
+
     return data.id;
   } catch (error) {
     console.error('Error updating image on Google Drive:', error);

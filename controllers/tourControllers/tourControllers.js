@@ -3,7 +3,7 @@ const { asyncHandler } = require('../../utils/asynhandler');
 const { ErrorHandler } = require('../../utils/errohandler');
 const { createSlug } = require('../../utils/createSlug');
 const { updateImageToS3, deleteObjectFromS3 } = require('../../middlewares/awsS3');
-const { uploadImage, deleteImage } = require('../../middlewares/imageHandlers');
+const { uploadImage, deleteImage, updateImageLocal } = require('../../middlewares/imageHandlers');
 
 
 const getTour = asyncHandler(async (req, res, next) => {
@@ -62,7 +62,7 @@ const addTour = asyncHandler(async (req, res, next) => {
   const includes = req?.body?.includes && JSON?.parse(req?.body?.includes);
   const highlights = req?.body?.highlights && JSON?.parse(req?.body?.highlights);
   const importantInformation = req?.body?.importantInformation && JSON?.parse(req?.body?.importantInformation);
-console.log("importantInformation ", importantInformation);
+// console.log("importantInformation ", importantInformation);
 
   const subCategory = await SubCategoryModel.findById(subCategoryId);
   if (!subCategory) {
@@ -267,9 +267,9 @@ const updateTour = asyncHandler(async (req, res, next) => {
   if (files && files.length !== 0) {
     for (const file of files) {
       if (file.fieldname === 'cardImage') {
-        await updateImageToS3( file, tour.cardImage,);
+        await updateImageLocal( file, tour.cardImage, "tour" );
       } else if (file.fieldname === 'tourImage') {
-        await updateImageToS3( file, tourImageId);
+        await updateImageLocal( file, tourImageId, "tour");
       }else if (file.fieldname === 'newtourImages') {
          const newImageId = await uploadImage( file, "tour");
          tour.tourImages.push(newImageId)
@@ -316,7 +316,7 @@ const deleteTour = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler('Error deleting images from drive', 500));
   }
 
-  const models = [PopularTourModel, BestTourModel, DiscountedTourModel];
+  const models = [PopularTourModel, BestTourModel, DiscountedTourModel, SubCategoryModel];
   await Promise.all(models.map(model => model.deleteOne({ tourId: tourId }).exec()));
 
   // Delete tour from main TourModel

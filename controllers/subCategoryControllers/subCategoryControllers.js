@@ -1,6 +1,6 @@
 const { updateImageToS3, deleteObjectFromS3 } = require('../../middlewares/awsS3');
 const { uploadImage, deleteImage, updateImageLocal } = require('../../middlewares/imageHandlers');
-const { SubCategoryModel, CategoryModel } = require('../../models');
+const { SubCategoryModel, CategoryModel, BestTourModel, DiscountedTourModel, PopularTourModel, TourModel } = require('../../models');
 const { asyncHandler } = require('../../utils/asynhandler');
 const { createSlug } = require('../../utils/createSlug');
 const { ErrorHandler } = require('../../utils/errohandler');
@@ -39,31 +39,37 @@ const getAllSubCategories = asyncHandler(async (req, res, next) => {
 
 const getSubCategory = asyncHandler(async (req, res, next) => {
   const { slug } = req.params;
-  
-  
+
+  // Debugging check to ensure document exists
+  const exist = await SubCategoryModel.findOne({ slug });
+  console.log("SubCategory Document Found with findOne:", exist);
+
   const SubCategory = await SubCategoryModel.aggregate([
     { $match: { slug } },
     {
       $lookup: {
-        from: 'tours', 
+        from: 'tours',
         localField: 'tourId',
         foreignField: '_id',
         as: 'tourId',
       },
     },
     {
-      $unwind: '$tourId', 
+      $unwind: {
+        path: '$tourId',
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $lookup: {
-        from: 'reviews', 
+        from: 'reviews',
         localField: 'tourId.reviewsId',
         foreignField: '_id',
         as: 'tourId.reviewsId',
       },
     },
     {
-      $group: { 
+      $group: {
         _id: '$_id',
         categoryId: { $first: '$categoryId' },
         subCategoryName: { $first: '$subCategoryName' },
@@ -72,31 +78,30 @@ const getSubCategory = asyncHandler(async (req, res, next) => {
         subCategoryText: { $first: '$subCategoryText' },
         subCategoryHeroImage: { $first: '$subCategoryHeroImage' },
         subCategoryMobHeroImage: { $first: '$subCategoryMobHeroImage' },
-        tourId: { $push: '$tourId',
-
-         },
-      },
-    },
-    {
-      $addFields: {
-        'tourId.reviewCount': { $size: '$tourId.reviewsId' },
+        tourId: {
+          $push: {
+            tourDetails: '$tourId',
+            reviewCount: { $size: { $ifNull: ['$tourId.reviewsId', []] } },
+          },
+        },
       },
     },
   ]);
 
+  console.log("Aggregation Result:", SubCategory);
 
-
-  if (!SubCategory) {
+  if (!SubCategory || SubCategory.length === 0) {
     return next(new ErrorHandler('Subcategory Not Found', 404));
   }
 
   return res.status(200).json({
     status: 'Success',
     code: 200,
-    message: 'Request Successfull',
+    message: 'Request Successful',
     data: SubCategory,
   });
 });
+
 
 const addSubCategory = asyncHandler(async (req, res, next) => {
   const { files } = req;
@@ -213,7 +218,7 @@ const updateSubCategory = asyncHandler(async (req, res, next) => {
   
   if(files && files.length !== 0){
     const updateImage = files.find((item)=>item.fieldname === 'subCategoryImage')
-    const updateHeroImage = files.find((item)=>item.fieldname === 'subCategoryHeroImage')
+    const updateHeroImage = files.find((item)=>item.fieldname === 'subCategoryHeroImage') 
     const updateMobHeroImage = files.find((item)=>item.fieldname === 'subCategoryMobHeroImage')
 
     if(updateImage){
@@ -261,6 +266,18 @@ const deleteSubCategory = asyncHandler(async (req, res, next) => {
   const { subcategoryId } = req.params;
 
   const subCategory = await SubCategoryModel.findByIdAndDelete(subcategoryId).exec();
+  
+  if (subCategory && subCategory.tourId && subCategory.tourId.length > 0) {
+    const tourIds = subCategory.tourId;
+  
+    const models = [ TourModel, PopularTourModel, BestTourModel, DiscountedTourModel, SubCategoryModel];
+    
+    await Promise.all(
+      models.map(model => 
+        model.deleteMany({ tourId: { $in: tourIds } }).exec()
+      )
+    );
+  }
 
   if (!subCategory) {
     return next(new ErrorHandler('Subcategory Doesn\'t Exist', 404));
