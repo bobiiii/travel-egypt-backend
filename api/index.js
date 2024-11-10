@@ -19,9 +19,11 @@ app.use(
   cors({
     origin: [
       'http://localhost:3000',
-      'https://egypt-travel-frontend.vercel.app',
+      "https://aegyptenmalanders.de",
+      "https://www.aegyptenmalanders.de",
+      // 'https://egypt-travel-frontend.vercel.app',
       // 'http://127.0.0.1:5500/index.html',
-      "https://vps-650845.dogado-cloud.de"
+      // "https://vps-650845.dogado-cloud.de"
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
