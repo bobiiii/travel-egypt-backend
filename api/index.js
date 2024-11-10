@@ -41,7 +41,7 @@ if (process.env.NODE_ENV === 'development') {
 app.get('/', (req, res) => res.status(200).json({ message: 'Working fine' }));
 app.use('/api', apiRoutes);
 app.use('/admin', adminOnly, adminRoutes);
-app.use('/images', express.static(path.resolve(__dirname, '../public/images')));
+app.use('/imageslocal', express.static(path.resolve(__dirname, '../public/images')));
 
 // app.use(express.static(path.resolve(__dirname, '../public')));
 
