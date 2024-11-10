@@ -79,12 +79,34 @@ const getSubCategory = asyncHandler(async (req, res, next) => {
         subCategoryHeroImage: { $first: '$subCategoryHeroImage' },
         subCategoryMobHeroImage: { $first: '$subCategoryMobHeroImage' },
         tourId: {
-          $push: {
-            tourDetails: '$tourId',
-            reviewCount: { $size: { $ifNull: ['$tourId.reviewsId', []] } },
-          },
-        },
-      },
+            $push: {
+                tourDetails: {
+                    $mergeObjects: [
+                        '$tourId',
+                        {
+                            reviewsId: {
+                                $filter: {
+                                    input: '$tourId.reviewsId',
+                                    as: 'review',
+                                    cond: { $eq: ['$$review.status', 'Approved'] }
+                                }
+                            }
+                        }
+                    ]
+                },
+                reviewCount: {
+                    $size: {
+                        $filter: {
+                            input: '$tourId.reviewsId',
+                            as: 'review',
+                            cond: { $eq: ['$$review.status', 'Approved'] }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     },
   ]);
 
