@@ -42,7 +42,6 @@ const getSubCategory = asyncHandler(async (req, res, next) => {
 
   // Debugging check to ensure document exists
   const exist = await SubCategoryModel.findOne({ slug });
-  console.log("SubCategory Document Found with findOne:", exist);
 
   const SubCategory = await SubCategoryModel.aggregate([
     { $match: { slug } },
@@ -79,38 +78,35 @@ const getSubCategory = asyncHandler(async (req, res, next) => {
         subCategoryHeroImage: { $first: '$subCategoryHeroImage' },
         subCategoryMobHeroImage: { $first: '$subCategoryMobHeroImage' },
         tourId: {
-            $push: {
-                tourDetails: {
-                    $mergeObjects: [
-                        '$tourId',
-                        {
-                            reviewsId: {
-                                $filter: {
-                                    input: '$tourId.reviewsId',
-                                    as: 'review',
-                                    cond: { $eq: ['$$review.status', 'Approved'] }
-                                }
-                            }
-                        }
-                    ]
+          $push: {
+            $mergeObjects: [
+              '$tourId',
+              {
+                reviewsId: {
+                  $filter: {
+                    input: '$tourId.reviewsId',
+                    as: 'review',
+                    cond: { $eq: ['$$review.status', 'Approved'] },
+                  },
                 },
                 reviewCount: {
-                    $size: {
-                        $filter: {
-                            input: '$tourId.reviewsId',
-                            as: 'review',
-                            cond: { $eq: ['$$review.status', 'Approved'] }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
+                  $size: {
+                    $filter: {
+                      input: '$tourId.reviewsId',
+                      as: 'review',
+                      cond: { $eq: ['$$review.status', 'Approved'] },
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+      },
     },
   ]);
+  
 
-  console.log("Aggregation Result:", SubCategory);
 
   if (!SubCategory || SubCategory.length === 0) {
     return next(new ErrorHandler('Subcategory Not Found', 404));
