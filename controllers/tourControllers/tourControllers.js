@@ -259,17 +259,20 @@ const updateTour = asyncHandler(async (req, res, next) => {
     includes.point = includePoint || includes.point;
     includes.type = includeType || includes.type;
   } 
-  //  if (importantInfo) {
-  //   importantInfo.point = importantInfoPoint || importantInfo.point;
-  // }
+
 
 
   if (files && files.length !== 0) {
     for (const file of files) {
       if (file.fieldname === 'cardImage') {
-        await updateImageLocal( file, tour.cardImage, "tour" );
+        const newcardImage = await updateImageLocal( file, tour.cardImage, "tour" );
+        tour.cardImage = newcardImage
       } else if (file.fieldname === 'tourImage') {
-        await updateImageLocal( file, tourImageId, "tour");
+        const updatedImageId = await updateImageLocal( file, tourImageId, "tour");
+        const index = tour.tourImages.indexOf(tourImageId);
+        if (index !== -1) {
+          tour.tourImages[index] = updatedImageId;
+        }
       }else if (file.fieldname === 'newtourImages') {
          const newImageId = await uploadImage( file, "tour");
          tour.tourImages.push(newImageId)
