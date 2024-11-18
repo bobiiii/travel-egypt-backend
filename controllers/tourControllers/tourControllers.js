@@ -164,13 +164,36 @@ const updateTour = asyncHandler(async (req, res, next) => {
   const { files } = req;
   const {
     title, duration, description, fullDescription, strikePrice,discountAmount, priceAdult, priceChild, priceInfant, languages, tag,  subCategoryId,
-    highlightPoint, highlightId, includePoint, includePointId, includeType, importantInfoId,  importantInfoPoint, importantInfoHeading, tourImageId
+    highlightPoint, highlightId, includePoint, includePointId, includeType, importantInfoId,  importantInfoPoint, importantInfoHeading, tourImageId, deleteImageId
   } = req.body;
 
+  
   let tour = await TourModel.findById(tourId);
   if (!tour) {
     return next(new ErrorHandler('Tour Not Found', 404));
   }
+
+  
+  if (deleteImageId) {
+    tour.tourImages = tour.tourImages.filter((imageId) => imageId !== deleteImageId);
+    const updatedTour = await tour.save();
+    console.log("deleteImageId  ", deleteImageId);
+
+    if (!updatedTour) {
+      return next(new ErrorHandler('Error while deleting image', 500));
+    }
+
+    return res.status(200).json({
+      status: 'Success',
+      code: 200,
+      message: 'Image deleted successfully',
+      data: updatedTour,
+    });
+  }
+
+  
+  
+
 
   if (discountAmount > 0) {
     tour.childPriceAfterDiscount = tour.priceChild - discountAmount;
