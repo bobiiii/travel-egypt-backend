@@ -1,5 +1,9 @@
-const { getAllTours, getTour, addTour, updateTour, deleteTour, } = require("./tourControllers")
+const { getAllTours, getTour, addTour, updateTour,addTourData,   addIncludePoint,
+    addHighlightPoint, deleteTour,  deleteIncludePoint,
+    deleteHighlightPoint } = require("./tourControllers")
 
 module.exports = {
-    getAllTours, getTour, addTour, updateTour, deleteTour,
+    getAllTours, getTour, addTour, updateTour, addTourData,   addIncludePoint,
+    addHighlightPoint, deleteTour,  deleteIncludePoint,
+    deleteHighlightPoint
 }

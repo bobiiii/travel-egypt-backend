@@ -8,7 +8,7 @@ const { uploadImage, deleteImage, updateImageLocal } = require('../../middleware
 
 const getTour = asyncHandler(async (req, res, next) => {
   const { slug } = req.params;
-  const tour = await TourModel.findOne({slug}).populate({
+  const tour = await TourModel.findOne({ slug }).populate({
     path: 'reviewsId',
     model: 'Review', // assuming your review model is named 'Review'
     match: { status: 'Approved' }
@@ -28,7 +28,7 @@ const getTour = asyncHandler(async (req, res, next) => {
 });
 
 const getAllTours = asyncHandler(async (req, res, next) => {
-  
+
   const tours = await TourModel.find({}).populate({
     path: 'reviewsId',
     model: 'Review', // assuming your review model is named 'Review'
@@ -52,31 +52,31 @@ const getAllTours = asyncHandler(async (req, res, next) => {
 const addTour = asyncHandler(async (req, res, next) => {
   const { files } = req;
   const {
-    title, duration, description, fullDescription, strikePrice, discountAmount, priceAdult, priceChild, priceInfant, languages, tag,  subCategoryId,
+    title, duration, description, fullDescription, strikePrice, discountAmount, priceAdult, priceChild, priceInfant, languages, tag, subCategoryId,
   } = req.body;
 
-  if (!title || !duration || !description  || !fullDescription || !priceAdult || !priceChild || !priceInfant || !tag  || !subCategoryId )  { 
+  if (!title || !duration || !description || !fullDescription || !priceAdult || !priceChild || !priceInfant || !tag || !subCategoryId) {
     return next(new ErrorHandler('Please fill all required fields', 400));
   }
 
   const includes = req?.body?.includes && JSON?.parse(req?.body?.includes);
   const highlights = req?.body?.highlights && JSON?.parse(req?.body?.highlights);
   const importantInformation = req?.body?.importantInformation && JSON?.parse(req?.body?.importantInformation);
-// console.log("importantInformation ", importantInformation);
+  // console.log("importantInformation ", importantInformation);
 
   const subCategory = await SubCategoryModel.findById(subCategoryId);
   if (!subCategory) {
     return next(new ErrorHandler('SubCategory Not Found', 400));
   }
 
-  let childPriceAfterDiscount = 0 
+  let childPriceAfterDiscount = 0
   let adultPriceAfterDiscount = 0
-if (discountAmount > 0) {
-  childPriceAfterDiscount = priceChild - discountAmount,
-  adultPriceAfterDiscount = priceAdult - discountAmount
-}
+  if (discountAmount > 0) {
+    childPriceAfterDiscount = priceChild - discountAmount,
+      adultPriceAfterDiscount = priceAdult - discountAmount
+  }
 
-let cardImageId;
+  let cardImageId;
   const tourImagesPromises = [];
 
   for (const file of files) {
@@ -89,11 +89,11 @@ let cardImageId;
     }
   }
 
-const [cardImageIdResolved, ...tourImagesIdsResolved] = await Promise.all([
+  const [cardImageIdResolved, ...tourImagesIdsResolved] = await Promise.all([
     cardImageId || Promise.resolve(null),
     ...tourImagesPromises
   ]);
-  
+
   const slugAuto = createSlug(title);
   const tours = await TourModel.create({
     title,
@@ -117,10 +117,10 @@ const [cardImageIdResolved, ...tourImagesIdsResolved] = await Promise.all([
     // heading,
     importantInformation,
     subCategoryId,
-    
+
   });
-  
-  
+
+
   if (!tours) {
     return next(new ErrorHandler('Unable to add tours', 500));
   }
@@ -137,19 +137,19 @@ const [cardImageIdResolved, ...tourImagesIdsResolved] = await Promise.all([
   if (discountAmount > 0) {
     const discountedTour = await DiscountedTourModel.findOneAndUpdate(
       {}, // No filter, updates the first document or creates a new one
-      { 
-        $push: { tourId: tours._id }, 
-        },
-      { 
-        new: true, 
-        upsert: true 
+      {
+        $push: { tourId: tours._id },
+      },
+      {
+        new: true,
+        upsert: true
       }
     );
     if (!discountedTour) {
       return next(new ErrorHandler('Unable to add tour to discounted tours', 500));
-    }  
+    }
   }
-  
+
   return res.status(200).json({
     status: 'Success',
     code: 200,
@@ -163,17 +163,17 @@ const updateTour = asyncHandler(async (req, res, next) => {
   const { tourId } = req.params;
   const { files } = req;
   const {
-    title, duration, description, fullDescription, strikePrice,discountAmount, priceAdult, priceChild, priceInfant, languages, tag,  subCategoryId,
-    highlightPoint, highlightId, includePoint, includePointId, includeType, importantInfoId,  importantInfoPoint, importantInfoHeading, tourImageId, deleteImageId
+    title, duration, description, fullDescription, strikePrice, discountAmount, priceAdult, priceChild, priceInfant, languages, tag, subCategoryId,
+    highlightPoint, highlightId, includePoint, includePointId, includeType, importantInfoId, importantInfoPoint, importantInfoHeading, tourImageId, deleteImageId
   } = req.body;
 
-  
+
   let tour = await TourModel.findById(tourId);
   if (!tour) {
     return next(new ErrorHandler('Tour Not Found', 404));
   }
 
-  
+
   if (deleteImageId) {
     tour.tourImages = tour.tourImages.filter((imageId) => imageId !== deleteImageId);
     const updatedTour = await tour.save();
@@ -191,8 +191,8 @@ const updateTour = asyncHandler(async (req, res, next) => {
     });
   }
 
-  
-  
+
+
 
 
   if (discountAmount > 0) {
@@ -205,18 +205,20 @@ const updateTour = asyncHandler(async (req, res, next) => {
     });
     if (!discountedTour) {
       const newDiscountedTour = await DiscountedTourModel.findOneAndUpdate(
-        {}, 
-        { $push: { tourId: tour._id },},
-        { new: true, 
-          upsert: true }
+        {},
+        { $push: { tourId: tour._id }, },
+        {
+          new: true,
+          upsert: true
+        }
       );
 
 
       if (!newDiscountedTour) {
         return next(new ErrorHandler('Unable to add tour to discounted tours', 500));
       }
-    } 
-  } else if( discountAmount == 0){
+    }
+  } else if (discountAmount == 0) {
     tour.discountAmount = discountAmount
     tour.childPriceAfterDiscount = 0;
     tour.adultPriceAfterDiscount = 0;
@@ -225,7 +227,7 @@ const updateTour = asyncHandler(async (req, res, next) => {
       { $pull: { tourId: tour._id } },
       { new: true }
     );
-  
+
     if (!updatedDiscountedTour) {
       return next(new ErrorHandler('Unable to remove tour from discounted tours', 500));
     }
@@ -238,12 +240,12 @@ const updateTour = asyncHandler(async (req, res, next) => {
       if (info._id == importantInfoId) {
         return {
           ...info,
-          heading: importantInfoHeading || info.heading ,  // Update heading
-          points: importantInfoPoint ||   info.points  // Update points
+          heading: importantInfoHeading || info.heading,  // Update heading
+          points: importantInfoPoint || info.points  // Update points
         };
       }
       return info; // Return the object unchanged if ids don't match
-    });    
+    });
   }
 
 
@@ -261,14 +263,14 @@ const updateTour = asyncHandler(async (req, res, next) => {
   tour.tag = tag || tour.tag;
   // tour.heading = heading || tour.heading;
   tour.subCategoryId = subCategoryId || tour.subCategoryId;
-  
-  
-  
+
+
+
   if (title) {
-    tour.title = title 
+    tour.title = title
     const slugAuto = createSlug(title);
     tour.slug = slugAuto;
-      }
+  }
 
   const highlight = tour.highlights.find(h => h._id.toString() === highlightId);
   const includes = tour.includes.find(h => h._id.toString() === includePointId);
@@ -277,28 +279,28 @@ const updateTour = asyncHandler(async (req, res, next) => {
   if (highlight) {
     highlight.points = highlightPoint || highlight.points;
 
-  } 
+  }
   if (includes) {
     includes.point = includePoint || includes.point;
     includes.type = includeType || includes.type;
-  } 
+  }
 
 
 
   if (files && files.length !== 0) {
     for (const file of files) {
       if (file.fieldname === 'cardImage') {
-        const newcardImage = await updateImageLocal( file, tour.cardImage, "tour" );
+        const newcardImage = await updateImageLocal(file, tour.cardImage, "tour");
         tour.cardImage = newcardImage
       } else if (file.fieldname === 'tourImage') {
-        const updatedImageId = await updateImageLocal( file, tourImageId, "tour");
+        const updatedImageId = await updateImageLocal(file, tourImageId, "tour");
         const index = tour.tourImages.indexOf(tourImageId);
         if (index !== -1) {
           tour.tourImages[index] = updatedImageId;
         }
-      }else if (file.fieldname === 'newtourImages') {
-         const newImageId = await uploadImage( file, "tour");
-         tour.tourImages.push(newImageId)
+      } else if (file.fieldname === 'newtourImages') {
+        const newImageId = await uploadImage(file, "tour");
+        tour.tourImages.push(newImageId)
       }
     }
   }
@@ -317,6 +319,175 @@ const updateTour = asyncHandler(async (req, res, next) => {
     data: updatedTour,
   });
 });
+
+const addTourData = asyncHandler(async (req, res, next) => {
+  const { tourId } = req.params;
+  const { 
+    newHighlightPoint, 
+    newInclude, 
+    newImportantInfoPoint 
+  } = req.body;
+
+  // Find the tour by ID
+  const tour = await TourModel.findById(tourId).exec();
+  if (!tour) {
+    return next(new ErrorHandler('Tour Doesn\'t Exist', 404));
+  }
+
+  // Add new highlight point if provided
+  if (newHighlightPoint) {
+    tour.highlights.push({
+      points: newHighlightPoint
+    });
+  }
+
+  // Add new include if provided
+  if (newInclude) {
+    tour.includes.push({
+      point: newInclude.point || '',
+      type: newInclude.type || '',
+    });
+  }
+
+  // Add new important information point if provided
+  if (newImportantInfoPoint) {
+    if (tour.importantInformation.length > 0) {
+      // Add the point to the existing heading's points
+      tour.importantInformation[0].points.push(newImportantInfoPoint);
+    } else {
+      return next(new ErrorHandler('Important Information heading is missing', 400));
+    }
+  }
+
+  // Save the updated tour
+  const updatedTour = await tour.save();
+
+  if (!updatedTour) {
+    return next(new ErrorHandler('Error while adding tour data', 500));
+  }
+
+  return res.status(200).json({
+    status: 'Success',
+    code: 200,
+    message: 'Tour data added successfully',
+    data: updatedTour,
+  });
+});
+
+
+
+const addIncludePoint = asyncHandler(async (req, res, next) => {
+  const { tourId } = req.params; // Extract tour ID from request params
+  const { includePoint, includeType } = req.body; // Extract point and type from request body
+
+  if (!tourId || !includePoint || !includeType) {
+    return next(new ErrorHandler('Tour ID, include point, and include type are required', 400));
+  }
+
+  // Create the include object
+  const newInclude = {
+    point: includePoint,
+    type: includeType,
+  };
+
+  // Add the new include to the specific tour
+  const tour = await TourModel.findByIdAndUpdate(
+    tourId, // Match the tour by its ID
+    { $push: { includes: newInclude } }, // Add the new include object to the includes array
+    { new: true, runValidators: true } // Return the updated tour and validate the update
+  );
+
+  if (!tour) {
+    return next(new ErrorHandler('Tour not found', 404));
+  }
+
+  return res.status(200).json({
+    success: "Success",
+    message: 'Include point added successfully',
+    data: tour, // Return the updated tour as part of the response
+  });
+});
+
+
+const addHighlightPoint = asyncHandler(async (req, res, next) => {
+  const { tourId } = req.params; // Expecting tourId and includePoint from the frontend
+  const { highlightPoint } = req.body; // Expecting tourId and includePoint from the frontend
+
+  if (!tourId || !highlightPoint) {
+    return next(new ErrorHandler('Tour ID and Highlight point are required', 400));
+  }
+
+  // Add the includePoint to the specific tour
+  const tour = await TourModel.findByIdAndUpdate(
+    tourId, // Match the tour by its ID
+    { $push: { highlights: {points: highlightPoint} } }, // Add the new includePoint to the includes array
+    { new: true, runValidators: true } // Return the updated tour and validate the update
+  );
+
+  if (!tour) {
+    return next(new ErrorHandler('Tour not found', 404));
+  }
+
+  return res.status(200).json({
+    success: "Success",
+    message: 'highlights point added successfully',
+    data: tour, // Optional: return the updated tour
+  });
+});
+
+
+
+const deleteIncludePoint = asyncHandler(async (req, res, next) => {
+  const { includePointId } = req.body; // Assuming includePointId is sent in the request body
+
+  if (!includePointId) {
+    return next(new ErrorHandler('Include point ID is required', 400));
+  }
+
+  // Find the tour and remove the includePoint
+  const tour = await TourModel.findOneAndUpdate(
+    { "includes._id": includePointId }, // Match the tour containing the includePoint
+    { $pull: { includes: { _id: includePointId } } }, // Remove the specific includePoint
+    { new: true } // Return the updated document
+  );
+
+  if (!tour) {
+    return next(new ErrorHandler('Include point or tour not found', 404));
+  }
+
+  return res.status(200).json({
+    success: "Success",
+    message: 'Include point deleted successfully',
+    data: tour, // Send the updated tour back (optional)
+  });
+});
+
+const deleteHighlightPoint = asyncHandler(async (req, res, next) => {
+
+  const { highlightPointId } = req.body; // Assuming includePointId is sent in the request body
+
+  if (!highlightPointId) {
+    return next(new ErrorHandler('Highlight point ID is required', 400));
+  }
+
+  // Find the tour and remove the HighlightPoint
+  const tour = await TourModel.findOneAndUpdate(
+    { "highlights._id": highlightPointId }, // Match the tour containing the HighlightPoint
+    { $pull: { highlights: { _id: highlightPointId } } }, // Remove the specific HighlightPoint
+    { new: true } // Return the updated document
+  );
+
+  if (!tour) {
+    return next(new ErrorHandler('Highlight point or tour not found', 404));
+  }
+
+  return res.status(200).json({
+    success: "Success",
+    message: 'Highlight point deleted successfully',
+    data: tour, // Send the updated tour back (optional)
+  });
+
+})
 
 
 
@@ -365,5 +536,10 @@ module.exports = {
   getTour,
   addTour,
   updateTour,
+  addTourData,
   deleteTour,
+  addIncludePoint,
+  addHighlightPoint,
+  deleteIncludePoint,
+  deleteHighlightPoint
 };
