@@ -322,10 +322,10 @@ const updateTour = asyncHandler(async (req, res, next) => {
 
 const addTourData = asyncHandler(async (req, res, next) => {
   const { tourId } = req.params;
-  const { 
-    newHighlightPoint, 
-    newInclude, 
-    newImportantInfoPoint 
+  const {
+    newHighlightPoint,
+    newInclude,
+    newImportantInfoPoint
   } = req.body;
 
   // Find the tour by ID
@@ -402,7 +402,7 @@ const addIncludePoint = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    success: "Success",
+    status: "Success",
     message: 'Include point added successfully',
     data: tour, // Return the updated tour as part of the response
   });
@@ -420,7 +420,7 @@ const addHighlightPoint = asyncHandler(async (req, res, next) => {
   // Add the includePoint to the specific tour
   const tour = await TourModel.findByIdAndUpdate(
     tourId, // Match the tour by its ID
-    { $push: { highlights: {points: highlightPoint} } }, // Add the new includePoint to the includes array
+    { $push: { highlights: { points: highlightPoint } } }, // Add the new includePoint to the includes array
     { new: true, runValidators: true } // Return the updated tour and validate the update
   );
 
@@ -429,7 +429,7 @@ const addHighlightPoint = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    success: "Success",
+    status: "Success",
     message: 'highlights point added successfully',
     data: tour, // Optional: return the updated tour
   });
@@ -439,6 +439,7 @@ const addHighlightPoint = asyncHandler(async (req, res, next) => {
 
 const deleteIncludePoint = asyncHandler(async (req, res, next) => {
   const { includePointId } = req.body; // Assuming includePointId is sent in the request body
+  console.log("body", req.body);
 
   if (!includePointId) {
     return next(new ErrorHandler('Include point ID is required', 400));
@@ -456,7 +457,7 @@ const deleteIncludePoint = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    success: "Success",
+    status: "Success",
     message: 'Include point deleted successfully',
     data: tour, // Send the updated tour back (optional)
   });
@@ -465,6 +466,7 @@ const deleteIncludePoint = asyncHandler(async (req, res, next) => {
 const deleteHighlightPoint = asyncHandler(async (req, res, next) => {
 
   const { highlightPointId } = req.body; // Assuming includePointId is sent in the request body
+  console.log("body", req.body);
 
   if (!highlightPointId) {
     return next(new ErrorHandler('Highlight point ID is required', 400));
@@ -482,7 +484,7 @@ const deleteHighlightPoint = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    success: "Success",
+    status: "Success",
     message: 'Highlight point deleted successfully',
     data: tour, // Send the updated tour back (optional)
   });
