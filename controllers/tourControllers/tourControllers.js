@@ -526,7 +526,7 @@ const deleteIncludePoint = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    success: "Success",
+    status: "Success",
     message: 'Include point deleted successfully',
     data: tour, // Send the updated tour back (optional)
   });
@@ -552,7 +552,7 @@ const deleteHighlightPoint = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    success: "Success",
+    status: "Success",
     message: 'Highlight point deleted successfully',
     data: tour, // Send the updated tour back (optional)
   });
