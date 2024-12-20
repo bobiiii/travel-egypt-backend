@@ -403,7 +403,7 @@ const addIncludePoint = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    success: "Success",
+    status: "Success",
     message: 'Include points added successfully',
     data: tour, // Return the updated tour as part of the response
   });
@@ -414,6 +414,7 @@ const addIncludePoint = asyncHandler(async (req, res, next) => {
 const addHighlightPoint = asyncHandler(async (req, res, next) => {
   const { tourId } = req.params; // Extract tour ID from request params
   const highlights = req?.body?.highlights; // Parse highlights array from the request body
+  console.log("body", req?.body);
 
   if (!tourId || !Array.isArray(highlights) || highlights.length === 0) {
     return next(new ErrorHandler('Tour ID and a valid array of highlight points are required', 400));
@@ -438,7 +439,7 @@ const addHighlightPoint = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    success: "Success",
+    status: "Success",
     message: 'Highlight points added successfully',
     data: tour, // Return the updated tour as part of the response
   });
@@ -448,6 +449,7 @@ const addHighlightPoint = asyncHandler(async (req, res, next) => {
 const addImportantInformation = asyncHandler(async (req, res, next) => {
   const { tourId } = req.params; // Extract tour ID from request params
   const { heading, points } = req.body; // Extract heading and points from request body
+  console.log("addImportantInformation", req.body);
 
   if (!tourId || !heading || !Array.isArray(points) || points.length === 0) {
     return next(
@@ -473,7 +475,7 @@ const addImportantInformation = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    success: true,
+    status: "Success",
     message: 'Important information added successfully',
     data: tour, // Return the updated tour with important information
   });
@@ -498,7 +500,7 @@ const deleteImportantInformation = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({
-    success: "Success",
+    status: "Success",
     message: 'Important information deleted successfully',
     data: tour, // Return the updated tour after deletion
   });
