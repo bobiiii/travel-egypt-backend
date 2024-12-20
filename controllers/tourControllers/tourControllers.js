@@ -322,10 +322,10 @@ const updateTour = asyncHandler(async (req, res, next) => {
 
 const addTourData = asyncHandler(async (req, res, next) => {
   const { tourId } = req.params;
-  const { 
-    newHighlightPoint, 
-    newInclude, 
-    newImportantInfoPoint 
+  const {
+    newHighlightPoint,
+    newInclude,
+    newImportantInfoPoint
   } = req.body;
 
   // Find the tour by ID
@@ -378,22 +378,23 @@ const addTourData = asyncHandler(async (req, res, next) => {
 
 const addIncludePoint = asyncHandler(async (req, res, next) => {
   const { tourId } = req.params; // Extract tour ID from request params
-  const { includePoint, includeType } = req.body; // Extract point and type from request body
+  const includes = req?.body?.includes; // Parse includes array from the request body
 
-  if (!tourId || !includePoint || !includeType) {
-    return next(new ErrorHandler('Tour ID, include point, and include type are required', 400));
+  if (!tourId || !Array.isArray(includes) || includes.length === 0) {
+    return next(new ErrorHandler('Tour ID and a valid array of include points are required', 400));
   }
 
-  // Create the include object
-  const newInclude = {
-    point: includePoint,
-    type: includeType,
-  };
+  for (const include of includes) {
+    if (!include.point || !include.type) {
+      return next(
+        new ErrorHandler('Each include must have a point and a type', 400)
+      );
+    }
+  }
 
-  // Add the new include to the specific tour
   const tour = await TourModel.findByIdAndUpdate(
     tourId, // Match the tour by its ID
-    { $push: { includes: newInclude } }, // Add the new include object to the includes array
+    { $push: { includes: { $each: includes } } }, // Use $each to push multiple items to the includes array
     { new: true, runValidators: true } // Return the updated tour and validate the update
   );
 
@@ -403,24 +404,32 @@ const addIncludePoint = asyncHandler(async (req, res, next) => {
 
   return res.status(200).json({
     success: "Success",
-    message: 'Include point added successfully',
+    message: 'Include points added successfully',
     data: tour, // Return the updated tour as part of the response
   });
 });
 
 
-const addHighlightPoint = asyncHandler(async (req, res, next) => {
-  const { tourId } = req.params; // Expecting tourId and includePoint from the frontend
-  const { highlightPoint } = req.body; // Expecting tourId and includePoint from the frontend
 
-  if (!tourId || !highlightPoint) {
-    return next(new ErrorHandler('Tour ID and Highlight point are required', 400));
+const addHighlightPoint = asyncHandler(async (req, res, next) => {
+  const { tourId } = req.params; // Extract tour ID from request params
+  const highlights = req?.body?.highlights; // Parse highlights array from the request body
+
+  if (!tourId || !Array.isArray(highlights) || highlights.length === 0) {
+    return next(new ErrorHandler('Tour ID and a valid array of highlight points are required', 400));
   }
 
-  // Add the includePoint to the specific tour
+  // Validate each highlight point (optional)
+  for (const highlight of highlights) {
+    if (!highlight.points) {
+      return next(new ErrorHandler('Each highlight must contain a "points" field', 400));
+    }
+  }
+
+  // Add the new highlight points to the specific tour
   const tour = await TourModel.findByIdAndUpdate(
     tourId, // Match the tour by its ID
-    { $push: { highlights: {points: highlightPoint} } }, // Add the new includePoint to the includes array
+    { $push: { highlights: { $each: highlights } } }, // Use $each to push multiple highlight points
     { new: true, runValidators: true } // Return the updated tour and validate the update
   );
 
@@ -430,15 +439,76 @@ const addHighlightPoint = asyncHandler(async (req, res, next) => {
 
   return res.status(200).json({
     success: "Success",
-    message: 'highlights point added successfully',
-    data: tour, // Optional: return the updated tour
+    message: 'Highlight points added successfully',
+    data: tour, // Return the updated tour as part of the response
+  });
+});
+
+
+const addImportantInformation = asyncHandler(async (req, res, next) => {
+  const { tourId } = req.params; // Extract tour ID from request params
+  const { heading, points } = req.body; // Extract heading and points from request body
+
+  if (!tourId || !heading || !Array.isArray(points) || points.length === 0) {
+    return next(
+      new ErrorHandler('Tour ID, heading, and an array of points are required', 400)
+    );
+  }
+
+  // Create the new important information object
+  const newImportantInfo = {
+    heading,
+    points,
+  };
+
+  // Add the new important information to the specific tour
+  const tour = await TourModel.findByIdAndUpdate(
+    tourId,
+    { $push: { importantInformation: newImportantInfo } }, // Push the new info into the importantInformation array
+    { new: true, runValidators: true } // Return the updated tour and validate the update
+  );
+
+  if (!tour) {
+    return next(new ErrorHandler('Tour not found', 404));
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: 'Important information added successfully',
+    data: tour, // Return the updated tour with important information
+  });
+});
+
+const deleteImportantInformation = asyncHandler(async (req, res, next) => {
+  const { tourId, infoId } = req.body; // Extract tour ID and information ID from the request params
+
+  if (!tourId || !infoId) {
+    return next(new ErrorHandler('Tour ID and Information ID are required', 400));
+  }
+
+  // Find the tour and remove the specific important information entry
+  const tour = await TourModel.findByIdAndUpdate(
+    tourId, // Match the tour by its ID
+    { $pull: { importantInformation: { _id: infoId } } }, // Remove the entry with the matching infoId
+    { new: true } // Return the updated tour
+  );
+
+  if (!tour) {
+    return next(new ErrorHandler('Tour or Information not found', 404));
+  }
+
+  return res.status(200).json({
+    success: "Success",
+    message: 'Important information deleted successfully',
+    data: tour, // Return the updated tour after deletion
   });
 });
 
 
 
+
 const deleteIncludePoint = asyncHandler(async (req, res, next) => {
-  const { includePointId } = req.body; // Assuming includePointId is sent in the request body
+  const { tourId, includePointId } = req.body; // Assuming includePointId is sent in the request body
 
   if (!includePointId) {
     return next(new ErrorHandler('Include point ID is required', 400));
@@ -446,7 +516,7 @@ const deleteIncludePoint = asyncHandler(async (req, res, next) => {
 
   // Find the tour and remove the includePoint
   const tour = await TourModel.findOneAndUpdate(
-    { "includes._id": includePointId }, // Match the tour containing the includePoint
+    tourId, // Match the tour containing the includePoint
     { $pull: { includes: { _id: includePointId } } }, // Remove the specific includePoint
     { new: true } // Return the updated document
   );
@@ -464,7 +534,7 @@ const deleteIncludePoint = asyncHandler(async (req, res, next) => {
 
 const deleteHighlightPoint = asyncHandler(async (req, res, next) => {
 
-  const { highlightPointId } = req.body; // Assuming includePointId is sent in the request body
+  const { tourId, highlightPointId } = req.body; // Assuming includePointId is sent in the request body
 
   if (!highlightPointId) {
     return next(new ErrorHandler('Highlight point ID is required', 400));
@@ -472,7 +542,7 @@ const deleteHighlightPoint = asyncHandler(async (req, res, next) => {
 
   // Find the tour and remove the HighlightPoint
   const tour = await TourModel.findOneAndUpdate(
-    { "highlights._id": highlightPointId }, // Match the tour containing the HighlightPoint
+    tourId,
     { $pull: { highlights: { _id: highlightPointId } } }, // Remove the specific HighlightPoint
     { new: true } // Return the updated document
   );
@@ -540,6 +610,8 @@ module.exports = {
   deleteTour,
   addIncludePoint,
   addHighlightPoint,
+  addImportantInformation,
   deleteIncludePoint,
-  deleteHighlightPoint
+  deleteHighlightPoint,
+  deleteImportantInformation
 };
