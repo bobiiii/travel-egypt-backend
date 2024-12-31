@@ -1,6 +1,7 @@
 const { MessageModel } = require("../../models")
 const { asyncHandler } = require("../../utils/asynhandler")
 const { ErrorHandler } = require("../../utils/errohandler")
+const nodemailer = require('nodemailer');
 
 const getMessages = asyncHandler(async(req,res,next)=>{
     // const {name, email , message} = req.body
@@ -28,6 +29,34 @@ const addMessage = asyncHandler(async(req,res,next)=>{
 const {name, email , message} = req.body
 if (!name || !email || !message) {
     return next(ErrorHandler("Please provide all required fields", 400))
+}
+
+const transporter = nodemailer.createTransport({
+    host: 'web153.alfahosting-server.de', // Replace with your SMTP host
+    port: 465, // Use 465 for secure connections, 587 for STARTTLS
+    secure: true, // Set to true for port 465
+    auth: {
+      user: process.env.ADMIN_EMAIL,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+
+const mailOptions = {
+    from: email,
+    to: process.env.ADMIN_EMAIL,
+    subject: 'New Contact Request',
+        text: `
+New message received:
+
+Name: ${name}
+Email: ${email}
+Message: ${message}`,
+replyTo: email,
+  };
+const messageDeliver = await transporter.sendMail(mailOptions);
+if (!messageDeliver) {
+    return next(ErrorHandler("unable to send message to Admin", 500))
 }
 
 const addMessage = await MessageModel.create({
