@@ -10,7 +10,7 @@ const getTour = asyncHandler(async (req, res, next) => {
   const { slug } = req.params;
   const tour = await TourModel.findOne({ slug }).populate({
     path: 'reviewsId',
-    model: 'Review', // assuming your review model is named 'Review'
+    model: 'Review', 
     match: { status: 'Approved' }
   })
 
@@ -31,7 +31,7 @@ const getAllTours = asyncHandler(async (req, res, next) => {
 
   const tours = await TourModel.find({}).populate({
     path: 'reviewsId',
-    model: 'Review', // assuming your review model is named 'Review'
+    model: 'Review', 
     match: { status: 'Approved' }
   })
 
@@ -62,7 +62,7 @@ const addTour = asyncHandler(async (req, res, next) => {
   const includes = req?.body?.includes && JSON?.parse(req?.body?.includes);
   const highlights = req?.body?.highlights && JSON?.parse(req?.body?.highlights);
   const importantInformation = req?.body?.importantInformation && JSON?.parse(req?.body?.importantInformation);
-  // console.log("importantInformation ", importantInformation);
+  
 
   const subCategory = await SubCategoryModel.findById(subCategoryId);
   if (!subCategory) {
@@ -114,7 +114,7 @@ const addTour = asyncHandler(async (req, res, next) => {
     tag,
     highlights,
     includes,
-    // heading,
+    
     importantInformation,
     subCategoryId,
 
@@ -126,8 +126,8 @@ const addTour = asyncHandler(async (req, res, next) => {
   }
   const updateSubcategory = await SubCategoryModel.findByIdAndUpdate(
     subCategoryId,
-    { $push: { tourId: tours._id } }, // Push the created tour's ID into the tourId array
-    { new: true } // Return the updated document
+    { $push: { tourId: tours._id } }, 
+    { new: true } 
   );
 
   if (!updateSubcategory) {
@@ -136,7 +136,7 @@ const addTour = asyncHandler(async (req, res, next) => {
 
   if (discountAmount > 0) {
     const discountedTour = await DiscountedTourModel.findOneAndUpdate(
-      {}, // No filter, updates the first document or creates a new one
+      {}, 
       {
         $push: { tourId: tours._id },
       },
@@ -223,7 +223,7 @@ const updateTour = asyncHandler(async (req, res, next) => {
     tour.childPriceAfterDiscount = 0;
     tour.adultPriceAfterDiscount = 0;
     const updatedDiscountedTour = await DiscountedTourModel.findOneAndUpdate(
-      {}, // Since you have only one document
+      {}, 
       { $pull: { tourId: tour._id } },
       { new: true }
     );
@@ -236,22 +236,22 @@ const updateTour = asyncHandler(async (req, res, next) => {
 
   if (importantInfoId) {
     tour.importantInformation = tour.importantInformation.map(info => {
-      // If the current object's id matches the importantInfoId, update it
+      
       if (info._id == importantInfoId) {
         return {
           ...info,
-          heading: importantInfoHeading || info.heading,  // Update heading
-          points: importantInfoPoint || info.points  // Update points
+          heading: importantInfoHeading || info.heading,  
+          points: importantInfoPoint || info.points  
         };
       }
-      return info; // Return the object unchanged if ids don't match
+      return info; 
     });
   }
 
 
 
 
-  // Update non-image fields
+  
   tour.duration = duration || tour.duration;
   tour.description = description || tour.description;
   tour.fullDescription = fullDescription || tour.fullDescription;
@@ -261,7 +261,7 @@ const updateTour = asyncHandler(async (req, res, next) => {
   tour.priceInfant = priceInfant || tour.priceInfant;
   tour.languages = languages || tour.languages;
   tour.tag = tag || tour.tag;
-  // tour.heading = heading || tour.heading;
+  
   tour.subCategoryId = subCategoryId || tour.subCategoryId;
 
 
@@ -274,7 +274,7 @@ const updateTour = asyncHandler(async (req, res, next) => {
 
   const highlight = tour.highlights.find(h => h._id.toString() === highlightId);
   const includes = tour.includes.find(h => h._id.toString() === includePointId);
-  // const importantInfo = tour.importantInformation.find(h => h._id.toString() === importantInfoPointId);
+  
 
   if (highlight) {
     highlight.points = highlightPoint || highlight.points;
@@ -328,20 +328,20 @@ const addTourData = asyncHandler(async (req, res, next) => {
     newImportantInfoPoint
   } = req.body;
 
-  // Find the tour by ID
+  
   const tour = await TourModel.findById(tourId).exec();
   if (!tour) {
     return next(new ErrorHandler('Tour Doesn\'t Exist', 404));
   }
 
-  // Add new highlight point if provided
+  
   if (newHighlightPoint) {
     tour.highlights.push({
       points: newHighlightPoint
     });
   }
 
-  // Add new include if provided
+  
   if (newInclude) {
     tour.includes.push({
       point: newInclude.point || '',
@@ -349,17 +349,17 @@ const addTourData = asyncHandler(async (req, res, next) => {
     });
   }
 
-  // Add new important information point if provided
+  
   if (newImportantInfoPoint) {
     if (tour.importantInformation.length > 0) {
-      // Add the point to the existing heading's points
+      
       tour.importantInformation[0].points.push(newImportantInfoPoint);
     } else {
       return next(new ErrorHandler('Important Information heading is missing', 400));
     }
   }
 
-  // Save the updated tour
+  
   const updatedTour = await tour.save();
 
   if (!updatedTour) {
@@ -377,8 +377,8 @@ const addTourData = asyncHandler(async (req, res, next) => {
 
 
 const addIncludePoint = asyncHandler(async (req, res, next) => {
-  const { tourId } = req.params; // Extract tour ID from request params
-  const includes = req?.body?.includes; // Parse includes array from the request body
+  const { tourId } = req.params; 
+  const includes = req?.body?.includes; 
 
   if (!tourId || !Array.isArray(includes) || includes.length === 0) {
     return next(new ErrorHandler('Tour ID and a valid array of include points are required', 400));
@@ -393,9 +393,9 @@ const addIncludePoint = asyncHandler(async (req, res, next) => {
   }
 
   const tour = await TourModel.findByIdAndUpdate(
-    tourId, // Match the tour by its ID
-    { $push: { includes: { $each: includes } } }, // Use $each to push multiple items to the includes array
-    { new: true, runValidators: true } // Return the updated tour and validate the update
+    tourId, 
+    { $push: { includes: { $each: includes } } }, 
+    { new: true, runValidators: true } 
   );
 
   if (!tour) {
@@ -405,33 +405,33 @@ const addIncludePoint = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     status: "Success",
     message: 'Include points added successfully',
-    data: tour, // Return the updated tour as part of the response
+    data: tour, 
   });
 });
 
 
 
 const addHighlightPoint = asyncHandler(async (req, res, next) => {
-  const { tourId } = req.params; // Extract tour ID from request params
-  const highlights = req?.body?.highlights; // Parse highlights array from the request body
+  const { tourId } = req.params; 
+  const highlights = req?.body?.highlights; 
   console.log("body", req?.body);
 
   if (!tourId || !Array.isArray(highlights) || highlights.length === 0) {
     return next(new ErrorHandler('Tour ID and a valid array of highlight points are required', 400));
   }
 
-  // Validate each highlight point (optional)
+  
   for (const highlight of highlights) {
     if (!highlight.points) {
       return next(new ErrorHandler('Each highlight must contain a "points" field', 400));
     }
   }
 
-  // Add the new highlight points to the specific tour
+  
   const tour = await TourModel.findByIdAndUpdate(
-    tourId, // Match the tour by its ID
-    { $push: { highlights: { $each: highlights } } }, // Use $each to push multiple highlight points
-    { new: true, runValidators: true } // Return the updated tour and validate the update
+    tourId, 
+    { $push: { highlights: { $each: highlights } } }, 
+    { new: true, runValidators: true } 
   );
 
   if (!tour) {
@@ -441,14 +441,14 @@ const addHighlightPoint = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     status: "Success",
     message: 'Highlight points added successfully',
-    data: tour, // Return the updated tour as part of the response
+    data: tour, 
   });
 });
 
 
 const addImportantInformation = asyncHandler(async (req, res, next) => {
-  const { tourId } = req.params; // Extract tour ID from request params
-  const { heading, points } = req.body; // Extract heading and points from request body
+  const { tourId } = req.params; 
+  const { heading, points } = req.body; 
   console.log("addImportantInformation", req.body);
 
   if (!tourId || !heading || !Array.isArray(points) || points.length === 0) {
@@ -457,17 +457,17 @@ const addImportantInformation = asyncHandler(async (req, res, next) => {
     );
   }
 
-  // Create the new important information object
+  
   const newImportantInfo = {
     heading,
     points,
   };
 
-  // Add the new important information to the specific tour
+  
   const tour = await TourModel.findByIdAndUpdate(
     tourId,
-    { $push: { importantInformation: newImportantInfo } }, // Push the new info into the importantInformation array
-    { new: true, runValidators: true } // Return the updated tour and validate the update
+    { $push: { importantInformation: newImportantInfo } }, 
+    { new: true, runValidators: true } 
   );
 
   if (!tour) {
@@ -477,22 +477,22 @@ const addImportantInformation = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     status: "Success",
     message: 'Important information added successfully',
-    data: tour, // Return the updated tour with important information
+    data: tour, 
   });
 });
 
 const deleteImportantInformation = asyncHandler(async (req, res, next) => {
-  const { tourId, infoId } = req.body; // Extract tour ID and information ID from the request params
+  const { tourId, infoId } = req.body; 
 
   if (!tourId || !infoId) {
     return next(new ErrorHandler('Tour ID and Information ID are required', 400));
   }
 
-  // Find the tour and remove the specific important information entry
+  
   const tour = await TourModel.findByIdAndUpdate(
-    tourId, // Match the tour by its ID
-    { $pull: { importantInformation: { _id: infoId } } }, // Remove the entry with the matching infoId
-    { new: true } // Return the updated tour
+    tourId, 
+    { $pull: { importantInformation: { _id: infoId } } }, 
+    { new: true } 
   );
 
   if (!tour) {
@@ -502,7 +502,7 @@ const deleteImportantInformation = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     status: "Success",
     message: 'Important information deleted successfully',
-    data: tour, // Return the updated tour after deletion
+    data: tour, 
   });
 });
 
@@ -510,17 +510,17 @@ const deleteImportantInformation = asyncHandler(async (req, res, next) => {
 
 
 const deleteIncludePoint = asyncHandler(async (req, res, next) => {
-  const { tourId, includePointId } = req.body; // Assuming includePointId is sent in the request body
+  const { tourId, includePointId } = req.body; 
 
   if (!includePointId) {
     return next(new ErrorHandler('Include point ID is required', 400));
   }
 
-  // Find the tour and remove the includePoint
+  
   const tour = await TourModel.findOneAndUpdate(
-    tourId, // Match the tour containing the includePoint
-    { $pull: { includes: { _id: includePointId } } }, // Remove the specific includePoint
-    { new: true } // Return the updated document
+    tourId, 
+    { $pull: { includes: { _id: includePointId } } }, 
+    { new: true } 
   );
 
   if (!tour) {
@@ -530,23 +530,23 @@ const deleteIncludePoint = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     status: "Success",
     message: 'Include point deleted successfully',
-    data: tour, // Send the updated tour back (optional)
+    data: tour, 
   });
 });
 
 const deleteHighlightPoint = asyncHandler(async (req, res, next) => {
 
-  const { tourId, highlightPointId } = req.body; // Assuming includePointId is sent in the request body
+  const { tourId, highlightPointId } = req.body; 
 
   if (!highlightPointId) {
     return next(new ErrorHandler('Highlight point ID is required', 400));
   }
 
-  // Find the tour and remove the HighlightPoint
+  
   const tour = await TourModel.findOneAndUpdate(
     tourId,
-    { $pull: { highlights: { _id: highlightPointId } } }, // Remove the specific HighlightPoint
-    { new: true } // Return the updated document
+    { $pull: { highlights: { _id: highlightPointId } } }, 
+    { new: true } 
   );
 
   if (!tour) {
@@ -556,7 +556,7 @@ const deleteHighlightPoint = asyncHandler(async (req, res, next) => {
   return res.status(200).json({
     status: "Success",
     message: 'Highlight point deleted successfully',
-    data: tour, // Send the updated tour back (optional)
+    data: tour, 
   });
 
 })
@@ -585,10 +585,25 @@ const deleteTour = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler('Error deleting images from drive', 500));
   }
 
-  const models = [PopularTourModel, BestTourModel, DiscountedTourModel, SubCategoryModel];
-  await Promise.all(models.map(model => model.deleteOne({ tourId: tourId }).exec()));
 
-  // Delete tour from main TourModel
+const modelsWithTourIdArray = [
+  PopularTourModel,
+  BestTourModel,
+  DiscountedTourModel,
+  SubCategoryModel
+];
+
+
+await Promise.all(
+  modelsWithTourIdArray.map(model =>
+    model.updateMany(
+      {}, 
+      { $pull: { tourId: tourId } } 
+    ).exec()
+  )
+);
+
+  
   const deletedTour = await TourModel.findByIdAndDelete(tourId).exec();
 
   if (!deletedTour) {
