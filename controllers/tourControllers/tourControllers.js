@@ -262,7 +262,31 @@ const updateTour = asyncHandler(async (req, res, next) => {
   tour.languages = languages || tour.languages;
   tour.tag = tag || tour.tag;
   
-  tour.subCategoryId = subCategoryId || tour.subCategoryId;
+
+  if (subCategoryId) {
+    // Find the tour's current subcategory
+    const oldSubCategory = await SubCategoryModel.findOne({ tourId: tour._id });
+  
+    if (oldSubCategory) {
+      await SubCategoryModel.findByIdAndUpdate(oldSubCategory._id, {
+        $pull: { tourId: tour._id },
+      });
+    }
+  
+    const updatedSubcategory  = await SubCategoryModel.findByIdAndUpdate(
+      subCategoryId,
+      { $push: { tourId: tour._id } },
+      { new: true }
+    );
+    if (!updatedSubcategory) {
+      return next(new ErrorHandler('Unable to add tour to subcategory', 500));
+    }
+
+
+
+    tour.subCategoryId = subCategoryId
+  }
+  
 
 
 
