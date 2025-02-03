@@ -11,6 +11,7 @@ const {
 
 const publicRoute = express.Router();
 
+
 publicRoute.post('/admin-login', userControllers.loginUserController);
 publicRoute.get('/get-tour/:slug', tourControllers.getTour);
 publicRoute.get('/get-all-tours', tourControllers.getAllTours);
