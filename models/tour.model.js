@@ -153,17 +153,63 @@ const approvedReviewSchema = new mongoose.Schema({
   addedDate: { type: Date, default: Date.now },
 });
 
-const blogSchema = new mongoose.Schema({
+const blogSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+      unique: true,
+    },
+    slug: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-  title : {type: String, trim: true},
-  slug:{type: String, trim: true},
-  cardImageId : {type: String, trim: true},
-  mainImageId: {type: String, trim: true},
-   shortdesc : {type: String, trim: true},
-   category : {type: String, trim: true},
-    date : {type: String, trim: true},
-   content: {type: Object , },
-});
+    cardImage: {
+      type: String,
+      required: true,
+    },
+    blogBannerImage: {
+      type: String,
+      required: true,
+    },
+
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+      enum: ["design", "development", "marketing"],
+    },
+
+    shortDesc: {
+      type: String,
+      required: true,
+      trim: true,
+
+    },
+
+    date: {
+      type: Date,
+      default: Date.now,
+    },
+
+    contentImageIds: {
+      type: [String],
+      required: true,
+    },
+
+    content: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
 
 const bookingSchema = new mongoose.Schema({
   tourId: { type: Schema.Types.ObjectId, ref: 'Tour', required: true },

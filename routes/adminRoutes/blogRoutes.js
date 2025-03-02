@@ -6,7 +6,7 @@ const blogRoute = express.Router();
 const upload = multer();
 
 blogRoute.post('/add-blog',upload.any(), blogControllers.addBlogController);
-blogRoute.put('/update-blog/:blogId', blogControllers.updateBlogController);
+blogRoute.put('/update-blog/:blogId', upload.any(), blogControllers.updateBlogController);
 blogRoute.delete('/delete-blog/:blogId', blogControllers.deleteBlogController);
 
 module.exports = blogRoute;

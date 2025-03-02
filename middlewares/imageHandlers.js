@@ -3,7 +3,7 @@ const path = require('path');
 
 const uploadImage = async (image, folder) => {
   return new Promise((resolve, reject) => {
-    
+
     if (!image) {
       return reject(new Error('No image provided'));
     }
@@ -15,16 +15,16 @@ const uploadImage = async (image, folder) => {
     const sanitizedFileName = image.originalname.replace(/\s+/g, '_');
     const uniqueFileName = `${uniqueId}_${sanitizedFileName}`;
 
-      const uploadPath = path.join(uploadDir, uniqueFileName);
-      fs.writeFile(uploadPath, image.buffer, (err) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(uniqueFileName);
-      });
-
+    const uploadPath = path.join(uploadDir, uniqueFileName);
+    fs.writeFile(uploadPath, image.buffer, (err) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(uniqueFileName);
     });
-  };
+
+  });
+};
 
 
 const updateImageLocal = async (newImage, oldImageName, folder) => {
@@ -65,7 +65,9 @@ const updateImageLocal = async (newImage, oldImageName, folder) => {
 const deleteImage = async (imageName, folder) => {
   return new Promise((resolve, reject) => {
     if (!imageName) {
-      return reject(new Error('No image name provided'));
+      console.info("No Image name provided while deleting blog")
+      return resolve(true);
+
     }
 
     const uploadDir = path.resolve(__dirname, '../public/images', folder);
@@ -75,18 +77,20 @@ const deleteImage = async (imageName, folder) => {
     if (fs.existsSync(imagePath)) {
       fs.unlink(imagePath, (err) => {
         if (err) {
-          return reject(err);
+          console.info("No Images found while deleting blog");
+          return resolve(true);
         }
         resolve('Image deleted successfully');
       });
     } else {
-      reject(new Error('Image does not exist'));
+      console.info("No Images found while deleting blog");
+      return resolve(true);
     }
   });
 };
 
 module.exports = {
-    uploadImage,
-    updateImageLocal,
-    deleteImage
+  uploadImage,
+  updateImageLocal,
+  deleteImage
 }
