@@ -14,6 +14,7 @@ const   messageControllers = require('./messageControllers');
 const   userControllers = require('./userControllerss');
 const   subscribeControllers = require('./subscribeControllers');
 const   blogControllers = require('./blogControllers');
+const   internalImageControllers = require('./internalImageControllers');
 
 
 
@@ -34,4 +35,5 @@ module.exports = {
   userControllers,
   subscribeControllers,
   blogControllers,
+  internalImageControllers,
 };
