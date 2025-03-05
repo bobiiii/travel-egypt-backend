@@ -60,8 +60,13 @@ const addBlogController = asyncHandler(async (req, res, next) => {
 
   const getSingleBlogController = asyncHandler(async (req, res, next) => {
     const {slug} = req.params
+    console.log("slug  ", slug);
+    
     const blog = await BlogModel.findOne({slug});
   
+console.log(" blog  ", blog);
+
+    
     if (!blog) {
       return next(new ErrorHandler('no Blog found'), 404);
     }
