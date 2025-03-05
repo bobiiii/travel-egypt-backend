@@ -25,7 +25,6 @@ const uploadImageToS3 = async (image) => {
   const command = new PutObjectCommand(uploadParams);
   try {
     const data = await s3Client.send(command);
-    console.log("data ", data);
     
     const region = 'us-east-1'; // or use process.env.AWS_REGION
     

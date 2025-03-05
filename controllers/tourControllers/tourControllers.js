@@ -177,8 +177,7 @@ const updateTour = asyncHandler(async (req, res, next) => {
   if (deleteImageId) {
     tour.tourImages = tour.tourImages.filter((imageId) => imageId !== deleteImageId);
     const updatedTour = await tour.save();
-    console.log("deleteImageId  ", deleteImageId);
-
+  
     if (!updatedTour) {
       return next(new ErrorHandler('Error while deleting image', 500));
     }
@@ -438,7 +437,6 @@ const addIncludePoint = asyncHandler(async (req, res, next) => {
 const addHighlightPoint = asyncHandler(async (req, res, next) => {
   const { tourId } = req.params; 
   const highlights = req?.body?.highlights; 
-  console.log("body", req?.body);
 
   if (!tourId || !Array.isArray(highlights) || highlights.length === 0) {
     return next(new ErrorHandler('Tour ID and a valid array of highlight points are required', 400));
@@ -473,8 +471,7 @@ const addHighlightPoint = asyncHandler(async (req, res, next) => {
 const addImportantInformation = asyncHandler(async (req, res, next) => {
   const { tourId } = req.params; 
   const { heading, points } = req.body; 
-  console.log("addImportantInformation", req.body);
-
+  
   if (!tourId || !heading || !Array.isArray(points) || points.length === 0) {
     return next(
       new ErrorHandler('Tour ID, heading, and an array of points are required', 400)
