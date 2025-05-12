@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
+const { environmentVariables } = require("./index")
 require('dotenv').config();
 
-if (!process.env.MONGODB_URI) {
+if (!environmentVariables.MONGODB_URI) {
   throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
 }
 
 
-const uri = process.env.NODE_ENV === 'development' ? process.env.MONGODB_URI_TEST :  process.env.MONGODB_URI;
+const uri = environmentVariables.NODE_ENV === 'development' ? environmentVariables.MONGODB_URI_TEST :  environmentVariables.MONGODB_URI;
 // const options = {
 //   useNewUrlParser: true,
 //   useUnifiedTopology: true,
@@ -20,7 +21,7 @@ const startDB = async (req, res, next) => {
     return;
   }
 
-  if (process.env.NODE_ENV === 'development') {
+  if (environmentVariables.NODE_ENV === 'development') {
     // In development mode, use a global variable so that the value
     // is preserved across module reloads caused by HMR (Hot Module Replacement).
     if (!global.mongoose) {
@@ -46,9 +47,9 @@ const startDB = async (req, res, next) => {
 };
 
 const startDBProduction = async () => {
-  if (process.env.NODE_ENV === 'production') {
+  if (environmentVariables.NODE_ENV === 'production') {
     try {
-      const connect = await mongoose.connect(process.env.MONGODB_URI,);
+      const connect = await mongoose.connect(environmentVariables.MONGODB_URI,);
       console.log('Database connected successfully:', connect.connection.host);
     } catch (error) {
       console.error('Database connection error:', error.message);
