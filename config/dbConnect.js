@@ -3,7 +3,7 @@ const { environmentVariables } = require("./index")
 require('dotenv').config();
 
 if (!environmentVariables.MONGODB_URI) {
-  throw new Error('Invalid/Missing environment variable: "MONGODB_URI"');
+  throw new Error(`Invalid/Missing environment variable: "MONGODB_URI" ${environmentVariables.MONGODB_URI}   `);
 }
 
 
@@ -49,7 +49,7 @@ const startDB = async (req, res, next) => {
 const startDBProduction = async () => {
   if (environmentVariables.NODE_ENV === 'production') {
     try {
-      const connect = await mongoose.connect(environmentVariables.MONGODB_URI,);
+      const connect = await mongoose.connect(environmentVariables.MONGODB_URI);
       console.log('Database connected successfully:', connect.connection.host);
     } catch (error) {
       console.error('Database connection error:', error.message);

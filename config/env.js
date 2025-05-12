@@ -3,7 +3,7 @@ require('dotenv').config();
 module.exports = {
   PORT: process.env.PORT || 8080,
   NODE_ENV: process.env.NODE_ENV,
-  MONGODB_URI: process.env.MONGODB_URI,
+  MONGODB_URI : process.env.MONGODB_URI,
   MONGODB_URI_TEST: process.env.MONGODB_URI_TEST,
   SECRET_KEY: process.env.SECRET_KEY,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
