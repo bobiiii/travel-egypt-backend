@@ -3,7 +3,8 @@ const { environmentVariables } = require("./index")
 require('dotenv').config();
 
 if (!environmentVariables.MONGODB_URI) {
-  throw new Error(`console error Invalid/Missing environment variable: "MONGODB_URI" ${environmentVariables.MONGODB_URI}   `);
+  console.log(`console error Invalid/Missing environment variable: "MONGODB_URI" ${environmentVariables.MONGODB_URI}   `);
+  // throw new Error(`console error Invalid/Missing environment variable: "MONGODB_URI" ${environmentVariables.MONGODB_URI}   `);
 }
 
 
